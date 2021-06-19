@@ -28,7 +28,7 @@ class Main extends Component {
     }
 
     render() {
-        console.log(this.props.userId);
+        // console.log(this.props.userId);
         let routes = null;
 
         if(this.props.token === null) {

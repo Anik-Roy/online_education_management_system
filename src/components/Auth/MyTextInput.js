@@ -9,6 +9,7 @@ const MyTextInput = ({ label, ...props }) => {
     return (
       <div className="form-group mb-4">
         <label htmlFor={props.id || props.name} style={{cursor: "pointer"}}>{label}</label>
+        {props.id === "classCode" && <span style={{display: "block", marginBottom: "15px"}}>Ask your teacher for the class code, then enter it here.</span>}
         <input className="form-control" {...field} {...props} />
         {meta.touched && meta.error ? (
           <div className="text-danger">{meta.error}</div>

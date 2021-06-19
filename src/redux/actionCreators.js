@@ -97,29 +97,29 @@ export const authCheckLoading = isLoading => {
 }
 
 export const authCheck = () => dispatch => {
-    dispatch(authCheckLoading(true));
+    dispatch(authLoading(true));
 
     const token = localStorage.getItem('token');
     
     if(!token) {
         // logout
-        dispatch(authCheckLoading(false));
+        dispatch(authLoading(false));
         dispatch(logout());
     } else {
         const expirationTime = new Date(localStorage.getItem('expirationTime'));
         if(expirationTime <= new Date()) {
             // logout
-            dispatch(authCheckLoading(false));
+            dispatch(authLoading(false));
             dispatch(logout());
         } else {
             const userId = localStorage.getItem('userId');
-            dispatch(authCheckLoading(false));
+            dispatch(authLoading(false));
             dispatch(authSuccess(token, userId));
         }
     }
 }
 
-/*
+
 // Modal toogle actions
 export const toogleClassModal = () => {
     console.log('clicked!');
@@ -158,14 +158,14 @@ export const createClassSuccess = data => {
     }
 }
 
-export const createClass = (className, section, subject, room, userId) => dispatch => {
+export const createClass = (clsData, userId) => dispatch => {
     dispatch(createClassLoading(true));
 
     let classDetails = {
-        className: className,
-        section: section,
-        subject: subject,
-        room: room,
+        className: clsData.className,
+        section: clsData.section,
+        subject: clsData.subject,
+        room: clsData.room,
         user: userId
     }
     axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/classes.json`, classDetails)
@@ -189,12 +189,22 @@ export const createClass = (className, section, subject, room, userId) => dispat
                             let class_info = response.data;
                             console.log(class_info);
                             axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json`, classDetails)
-                                .then(response => {
+                                .then(async response => {
                                     console.log(response);
                                     if(response.status === 200) {
+                                        let class_teacher_info = {};
+                                        await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${class_info.user}.json`)
+                                            .then(teacher_info => {
+                                                // console.log(teacher_info.data);
+                                                class_teacher_info = teacher_info.data;
+                                            })
+                                            .catch(error => {
+                                                console.log(error);
+                                                class_teacher_info = {};
+                                            });
                                         class_info = {
                                             key: response.data.name,
-                                            value: class_info
+                                            value: {...class_info, ...class_teacher_info}
                                         }
                                         dispatch(joinClassLoading(false));
                                         dispatch(joinClassSuccess(class_info));
@@ -218,23 +228,14 @@ export const createClass = (className, section, subject, room, userId) => dispat
                         dispatch(joinClassLoading(false));
                         dispatch(joinClassFailed(error));
                     });
-                return {
-                    type: actionTypes.CREATE_CLASS_SUCCESS,
-                    payload: classDetails
-                }
             }
         })
         .catch(error => {
             console.log(error);
             dispatch(createClassLoading(false));
-            return {
-                type: actionTypes.CREATE_CLASS_SUCCESS,
-                payload: {
-                    classDetails: classDetails
-                }
-            }
         });
 }
+
 
 // Join class actions
 export const joinClassLoading = isLoading => {
@@ -257,6 +258,7 @@ export const joinClassFailed = errMsg => {
         payload: errMsg
     }
 }
+
 
 const alreadyJoined = async (classCode, userId) => {
     let response = await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json?orderBy="user_id"&equalTo="${userId}"`);
@@ -284,6 +286,7 @@ export const joinClass = (classCode, userId) => dispatch => {
             if(response) {
                 // console.log(response.data);
                 dispatch(joinClassLoading(false));
+                dispatch(toogleJoinClassModal());
                 dispatch({
                     type: actionTypes.JOINED_ALREADY,
                     payload: "You've already enrolled in this class"
@@ -297,34 +300,49 @@ export const joinClass = (classCode, userId) => dispatch => {
                             let class_info = response.data;
                             console.log(class_info);
                             axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json`, classDetails)
-                                .then(response => {
+                                .then(async response => {
                                     console.log(response);
                                     if(response.status === 200) {
+                                        let class_teacher_info = {};
+                                        await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${class_info.user}.json`)
+                                            .then(teacher_info => {
+                                                // console.log(teacher_info.data);
+                                                class_teacher_info = teacher_info.data;
+                                            })
+                                            .catch(error => {
+                                                console.log(error);
+                                                class_teacher_info = {};
+                                            });
                                         class_info = {
                                             key: response.data.name,
-                                            value: class_info
+                                            value: {...class_info, ...class_teacher_info}
                                         }
                                         dispatch(joinClassLoading(false));
                                         dispatch(joinClassSuccess(class_info));
+                                        dispatch(toogleJoinClassModal());
                                     } else {
                                         dispatch(joinClassLoading(false));
-                                        dispatch(joinClassFailed("An error occured!"));
+                                        dispatch(joinClassFailed("An error occured! Try again!"));
+                                        dispatch(toogleJoinClassModal());
                                     }
                                 })
                                 .catch(error => {
                                     console.log(error);
                                     dispatch(joinClassLoading(false));
                                     dispatch(joinClassFailed(error));
+                                    dispatch(toogleJoinClassModal());
                                 });
                         } else {
                             console.log("No class found with this id!");
                             dispatch(joinClassLoading(false));
-                            dispatch(joinClassFailed("An error occured!"));
+                            dispatch(joinClassFailed("No class found with this id!"));
+                            dispatch(toogleJoinClassModal());
                         }
                     })
                     .catch(error => {
                         dispatch(joinClassLoading(false));
                         dispatch(joinClassFailed(error));
+                        dispatch(toogleJoinClassModal());
                     });
             }
         })
@@ -332,7 +350,6 @@ export const joinClass = (classCode, userId) => dispatch => {
             console.log(error);
         });
 }
-
 
 // Fetch class actions
 export const fetchClassLoading = isLoading => {
@@ -352,8 +369,21 @@ const fetchClassesFromClassCode = async data => {
             // classes.push({key: key, value: value});
             promises.push(
                 axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/classes/${value.classCode}.json`)
-                    .then(response => {
-                        classes.push({key: key, value: response.data, classCode: value.classCode});
+                    .then(async response => {
+                        const class_teacher = response.data.user;
+                        let class_teacher_info = null;
+
+                        await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${class_teacher}.json`)
+                            .then(teacher_info => {
+                                // console.log(teacher_info.data);
+                                class_teacher_info = teacher_info.data;
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                class_teacher_info = {};
+                            });
+                        // console.log(class_teacher);
+                        classes.push({key: key, value: {...response.data, ...class_teacher_info}, classCode: value.classCode});
                     })
             );
         });
@@ -392,6 +422,8 @@ export const fetchClass = userId => dispatch => {
                 })
                 .catch(error => {
                     console.log(error);
+                    dispatch(fetchClassError(error));
+                    dispatch(fetchClassLoading(false));
                 });
         })
         .catch(error => {
@@ -424,6 +456,7 @@ export const fetchClass = userId => dispatch => {
     //     });
 }
 
+/*
 export const fetchSingleClassLoading = isLoading => {
     return {
         type: actionTypes.FETCH_SINGLE_CLASS_LOADING,
@@ -460,12 +493,13 @@ export const fetchSingleClass = classId => dispatch => {
             dispatch(fetchSignleClassError(error));
         })
 }
+*/
 
 // Unenroll class actions
-export const unenrollSelectedClass = cls => {
+export const selectedClasstoUnenroll = cls => {
     console.log(cls);
     return {
-        type: actionTypes.UNENROLL_SELECTED_CLASS,
+        type: actionTypes.SELECTED_CLASS_TO_UNENROLL,
         payload: cls
     }
 }
@@ -510,6 +544,7 @@ export const unenrollClass = id => dispatch => {
 
 }
 
+/*
 export const addClassContentLoading = isLoading => {
     return {
         type: actionTypes.ADD_CLASS_CONTENT_LOADING,

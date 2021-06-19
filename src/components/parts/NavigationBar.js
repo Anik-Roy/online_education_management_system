@@ -2,25 +2,31 @@ import React, { useState } from 'react';
 import './NavigationBar.css';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import {toogleClassModal, toogleJoinClassModal, logout} from '../../redux/actionCreators';
 import {
     Collapse,
   Navbar,
   NavbarToggler,
   NavbarBrand,
   Nav,
-//   NavItem,
-//   NavLink,
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
-//   NavbarText
 } from 'reactstrap';
 
 const mapStateToProps = state => {
   return {
     token: state.token,
     userId: state.userId,
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+      toogleClassModal: () => dispatch(toogleClassModal()),
+      toogleJoinClassModal: () => dispatch(toogleJoinClassModal()),
+      logout: () => dispatch(logout())
   }
 }
 
@@ -37,8 +43,8 @@ const NavigationBar = props => {
         <DropdownItem>
           <Link to="/profile" className="text-decoration-none">Go to Profile</Link>
         </DropdownItem>
-        <DropdownItem>
-          <Link to="/logout" className="text-decoration-none">Logout</Link>
+        <DropdownItem onClick={props.logout}>
+          Logout
         </DropdownItem>
       </DropdownMenu>
     )
@@ -67,15 +73,12 @@ const NavigationBar = props => {
                 Create/Join a Class
               </DropdownToggle>
               <DropdownMenu right>
-                <DropdownItem>
-                  Option 1
-                </DropdownItem>
-                <DropdownItem>
-                  Option 2
+                <DropdownItem onClick={props.toogleJoinClassModal}>
+                  Join Class
                 </DropdownItem>
                 <DropdownItem divider />
-                <DropdownItem>
-                  Reset
+                <DropdownItem onClick={props.toogleClassModal}>
+                  Create Class
                 </DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
@@ -92,4 +95,4 @@ const NavigationBar = props => {
   );
 };
 
-export default connect(mapStateToProps)(NavigationBar);
+export default connect(mapStateToProps, mapDispatchToProps)(NavigationBar);
