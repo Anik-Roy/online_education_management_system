@@ -1,0 +1,152 @@
+.root {
+    /* background-color: red; */
+    padding: 20px;
+}
+.banner-top {
+    background-image: url("https://gstatic.com/classroom/themes/img_bookclub.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: #32AC71;
+    border: 1px solid #32AC71;
+    border-radius: 0.5rem;
+    width: 80%;
+    height: 200px;
+    margin: 0 auto;
+    padding: 20px;
+    color: white;
+    font-weight: bold;
+}
+.main-content {
+    /* background-color: tomato; */
+    width: 80%;
+    /* height: 100%; */
+    margin: 10px auto;
+    padding-top: 20px;
+    display: flex;
+}
+.main-content .class-notice {
+    width: 20%;
+    height: 100px;
+}
+.main-content .class-notice h2 {
+    letter-spacing: .01785714em;
+    font-family: 'Google Sans',Roboto,Arial,sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    color: #3c4043;
+    text-transform: none;
+}
+.main-content .class-notice span {
+    color: rgba(0,0,0,0.549);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+}
+.main-content .class-contents {
+    width: 80%;
+    height: auto;
+}
+.class-input-box {
+    border-radius: 0.5rem;
+    padding: 10px;
+}
+.demo-editor {
+    padding-left: 15px;
+    background-color: #F1F3F4;
+    min-height: 200px!important;
+}
+.class-content {
+    border-radius: 0.5rem;
+}
+.publisher-info {
+    display: flex;
+    align-items: center;
+    margin: 20px;
+}
+.publisher-name h5 {
+    letter-spacing: .01785714em;
+    font-family: 'Google Sans',Roboto,Arial,sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.25rem;
+    color: #3c4043;
+    text-transform: none;
+}
+.publisher-name span {
+    color: rgba(0,0,0,0.549);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+}
+.content-text {
+    margin: 20px;
+}
+.attached-contents {
+    display: flex;
+    flex-wrap: wrap;
+}
+.attached-contents > * {
+    display: flex;
+    flex: 44%;
+    height: 100%;
+    align-items: center;
+    margin: 2%;
+}
+/* .attached-content {
+    display: flex;
+    flex: 50%;
+    height: 100%;
+    align-items: center;
+    margin: 10px;
+} */
+.attached-thumbnail {
+    width: 200px;
+    height: 100px;
+}
+.attach-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px;
+}
+/* Responsive layout - makes a two column-layout instead of four columns */
+@media (max-width: 800px) {
+    .attached-contents > * {
+        flex: 50%;
+        max-width: 50%;
+    }
+}
+
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media (max-width: 600px) {
+    .attached-contents > * {
+        flex: 100%;
+        max-width: 100%;
+    }
+}
+.comment-form-box {
+    display: flex;
+    /* padding: 10px; */
+    /* background-color: red; */
+    align-items: center;
+    margin: 20px;
+}
+
+.comment-input-container {
+    display: flex;
+    border-radius: 1rem;
+    flex: 1;
+    height: 40px;
+    padding: 5px;
+    overflow: hidden;
+    align-items: center;
+}
+.comment-input-container input {
+    flex: 1;
+    height: 100%;
+    border: none;
+}
+.comment-input-container input:focus {
+    outline: none;
+}

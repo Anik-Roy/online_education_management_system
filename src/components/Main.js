@@ -7,6 +7,7 @@ import Signup from './Auth/Signup';
 import Login from './Auth/Login';
 import Logout from './Auth/Logout';
 import Home from './Home/Home';
+import ClassDetails from './ClassDetails/ClassDetails';
 
 const mapStateToProps = state => {
     return {
@@ -42,7 +43,8 @@ class Main extends Component {
         } else {
             routes = (
                 <Switch>
-                    <Route exact path="/" component={Home} />
+                    {/* <Route exact path="/" component={Home} /> */}
+                    <Route exact path="/" component={ClassDetails} />
                     <Route path="/logout" component={Logout} />
                     <Redirect to="/" />
                 </Switch>
