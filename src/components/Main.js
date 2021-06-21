@@ -43,8 +43,9 @@ class Main extends Component {
         } else {
             routes = (
                 <Switch>
-                    {/* <Route exact path="/" component={Home} /> */}
-                    <Route exact path="/" component={ClassDetails} />
+                    <Route exact path="/" component={Home} />
+                    {/* <Route exact path="/" component={ClassDetails} /> */}
+                    <Route path="/class/:classId" component={ClassDetails} />
                     <Route path="/logout" component={Logout} />
                     <Redirect to="/" />
                 </Switch>

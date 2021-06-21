@@ -54,7 +54,64 @@
 .demo-editor {
     padding-left: 15px;
     background-color: #F1F3F4;
-    min-height: 200px!important;
+    min-height: 100px!important;
+}
+.upload-file-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100px;
+    margin-bottom: 10px;
+    border: .0625rem solid #dadce0;
+    border-radius: 0.5rem;
+}
+.uploaded-file {
+    display: flex;
+    align-items: center;
+    height: 100px;
+}
+.uploaded-file video {
+    margin-right: 2px;
+}
+.uploaded-file .file-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* align-items: center; */
+    width: 100%;
+    padding: 20px;
+    border-left: .0625rem solid #e0e0e0;
+}
+.uploaded-file .file-info h5 {
+    letter-spacing: .00625em;
+    font-family: 'Google Sans',Roboto,Arial,sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5rem;
+    color: #3c4043;
+}
+.uploaded-file .file-info span {
+    letter-spacing: .01428571em;
+    font-family: Roboto,Arial,sans-serif;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+    color: #5f6368;
+}
+.upload-file-container .file-delete-icon {
+    font-size: 22px;
+    margin-right: 20px;
+}
+.btn-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.file {
+    opacity: 0;
+    width: 0.1px;
+    height: 0.1px;
+    position: absolute;
 }
 .class-content {
     border-radius: 0.5rem;
@@ -88,7 +145,7 @@
 }
 .attached-contents > * {
     display: flex;
-    flex: 44%;
+    flex: 46%;
     height: 100%;
     align-items: center;
     margin: 2%;

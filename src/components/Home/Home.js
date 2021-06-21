@@ -60,7 +60,7 @@ class Home extends Component {
     render() {
         // console.log(this.props.classes);
         let classCards = this.props.classes.map(cls => {
-            return <ClassCard key={cls.key} details={{...cls.value}} enrollId={cls.key} unenrollClass={this.props.unenrollClass} />
+            return <ClassCard key={cls.key} details={{...cls.value}} enrollId={cls.key} classCode={cls.classCode} unenrollClass={this.props.unenrollClass} />
         });
 
         return (

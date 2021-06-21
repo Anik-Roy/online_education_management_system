@@ -13,10 +13,16 @@ const INITIAL_STATE = {
     isCreateClassLoading: false,
     isJoinClassLoading: false,
     fetchClassLoading: false,
+    fetchSingleClassLoading: false,
+    addClassContentLoading: false,
+    fetchClassContentsLoading: false,
 
     joinClassFailedMsg: "",
     joinedAlreadyMsg: "",
     fetchClassErrorMsg: "",
+    fetchSingleClassErrorMsg: "",
+    addClassContentSuccessMsg: "",
+    addClassContentErrorMsg: "",
 
     selectedClassToUnenroll: null,
     unenrollClassSuccessMsg: "",
@@ -24,7 +30,9 @@ const INITIAL_STATE = {
 
     unenrollClassLoading: false,
 
+    classDetails: null,
     classes: [],
+    classContents: [],
 }
 
 export const reducer = (state=INITIAL_STATE, action) => {
@@ -133,6 +141,51 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 fetchClassErrorMsg: action.payload
             }
         
+        case actionTypes.FETCH_SINGLE_CLASS_LOADING:
+            return {
+                ...state,
+                fetchSingleClassLoading: action.payload
+            }
+        
+        case actionTypes.FETCH_SINGLE_CLASS_ERROR:
+            return {
+                ...state,
+                fetchSingleClassErrorMsg: action.payload
+            }
+        
+        case actionTypes.FETCH_SINGLE_CLASS:
+            return {
+                ...state,
+                classDetails: action.payload
+            }
+        
+        case actionTypes.ADD_CLASS_CONTENT_LOADING:
+            return {
+                ...state,
+                addClassContentLoading: action.payload
+            }
+        
+        case actionTypes.ADD_CLASS_CONTENT:
+            return {
+                ...state,
+                addClassContentLoading: false,
+                addClassContentSuccessMsg: "Class added successfully!",
+                classContents: state.classContents.concat(action.payload)
+            }
+        
+        case actionTypes.FETCH_CLASS_CONTENTS_LOADING:
+            return {
+                ...state,
+                fetchClassContentsLoading: action.payload
+            }
+        
+        case actionTypes.FETCH_CLASS_CONTENTS_SUCCESS:
+            return {
+                ...state,
+                fetchClassContentsLoading: false,
+                classContents: action.payload
+            }
+
         case actionTypes.SELECTED_CLASS_TO_UNENROLL:
             return {
                 ...state,

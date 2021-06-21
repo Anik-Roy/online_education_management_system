@@ -456,7 +456,6 @@ export const fetchClass = userId => dispatch => {
     //     });
 }
 
-/*
 export const fetchSingleClassLoading = isLoading => {
     return {
         type: actionTypes.FETCH_SINGLE_CLASS_LOADING,
@@ -493,7 +492,6 @@ export const fetchSingleClass = classId => dispatch => {
             dispatch(fetchSignleClassError(error));
         })
 }
-*/
 
 // Unenroll class actions
 export const selectedClasstoUnenroll = cls => {
@@ -544,7 +542,6 @@ export const unenrollClass = id => dispatch => {
 
 }
 
-/*
 export const addClassContentLoading = isLoading => {
     return {
         type: actionTypes.ADD_CLASS_CONTENT_LOADING,
@@ -562,27 +559,30 @@ export const addClassContentSuccess = (pushId, content) => {
     }
 }
 
-export const addClassContent = (content, uploadFileUrls, classId) => dispatch => {
+export const addClassContent = (rawText, attachedFileUrls, classId, userId) => dispatch => {
     dispatch(addClassContentLoading(true));
-    console.log(classId);
+    // console.log(classId);
     
     const upload_content = {
-        post: content,
-        uploadFileUrls,
+        rawText: rawText,
+        attachedFileUrls,
+        classId,
+        userId,
         posted_at: new Date()
     }
 
     // console.log(upload_content);
 
-    axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/classes/${classId}/contents.json`, upload_content)
+    axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/class_contents.json`, upload_content)
         .then(response => {
             // console.log(response);
             const pushId = response.data.name;
             // console.log(pushId);
-            axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/classes/${classId}/contents/${pushId}.json`)
+            axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/class_contents/${pushId}.json`)
                 .then(response => {
                     console.log(response.data);
                     dispatch(addClassContentSuccess(pushId, response.data));
+                    return 'success';
                 })
                 .catch(error => {
                     console.log(error);
@@ -590,8 +590,27 @@ export const addClassContent = (content, uploadFileUrls, classId) => dispatch =>
         })
         .catch(error => {
             console.log(error);
-        })
+        });
+
+    // axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/classes/${classId}/contents.json`, upload_content)
+    //     .then(response => {
+    //         // console.log(response);
+    //         const pushId = response.data.name;
+    //         // console.log(pushId);
+    //         axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/classes/${classId}/contents/${pushId}.json`)
+    //             .then(response => {
+    //                 console.log(response.data);
+    //                 dispatch(addClassContentSuccess(pushId, response.data));
+    //             })
+    //             .catch(error => {
+    //                 console.log(error);
+    //             })
+    //     })
+    //     .catch(error => {
+    //         console.log(error);
+    //     })
 }
+
 
 export const fetchClassContentsLoading = isLoading => {
     return {
@@ -608,19 +627,24 @@ export const fetchClassContentsSuccess = contents => {
 }
 
 export const fetchClassContents = classId => dispatch => {
+    console.log(classId);
     dispatch(fetchClassContentsLoading(true));
-    axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/classes/${classId}/contents.json`)
+    axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/class_contents.json?orderBy="classId"&equalTo="${classId}"`)
         .then(response => {
             let data_list = [];
-            if(response.data !== null)
-                data_list = Object.keys(response.data).map(key => {return {key, value: response.data[key]}});
-            dispatch(fetchClassContentsSuccess(data_list));
+            if(response.data !== null) {
+                console.log(response.data);
+                data_list = Object.keys(response.data).map(key => {return {key, value: response.data[key]}});   
+                // console.log(data_list);
+                // dispatch(fetchClassContentsSuccess(data_list));
+            }
         })
         .catch(error => {
             console.log(error);
         })
 }
 
+/*
 export const addClassCommentLoading = isLoading => {
     return {
         type: actionTypes.ADD_COMMENT_IN_CLASS_CONTENT_LOADING,
