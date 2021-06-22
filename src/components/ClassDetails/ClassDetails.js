@@ -5,10 +5,11 @@ import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import { Button, Progress, Spinner, Alert } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane, faPaperclip, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import { faPaperclip, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {connect} from 'react-redux';
-import {fetchSingleClass, addClassContent, fetchClassContents} from '../../redux/actionCreators';
+import {fetchSingleClass, addClassContent, fetchClassContents, fetchClassComments} from '../../redux/actionCreators';
 import { firebase, storage } from '../../firebase';
+import ClassContent from './ClassContent/ClassContent';
 
 const mapStateToProps = state => {
     return {
@@ -16,7 +17,9 @@ const mapStateToProps = state => {
         classDetails: state.classDetails,
         addClassContentLoading: state.addClassContentLoading,
         addClassContentSuccessMsg: state.addClassContentSuccessMsg,
-        addClassContentErrorMsg: state.addClassContentErrorMsg
+        addClassContentErrorMsg: state.addClassContentErrorMsg,
+        classContents: state.classContents,
+        classComments: state.classComments
     }
 }
 
@@ -24,7 +27,8 @@ const mapDispatchToProps = dispatch => {
     return {
         fetchSingleClass: clsId => dispatch(fetchSingleClass(clsId)),
         addClassContent: (text, uploadFileUrls, clsId, userId) => dispatch(addClassContent(text, uploadFileUrls, clsId, userId)),
-        fetchClassContents: clsId => dispatch(fetchClassContents(clsId))
+        fetchClassContents: clsId => dispatch(fetchClassContents(clsId)),
+        fetchClassComments: clsId => dispatch(fetchClassComments(clsId))
     }
 }
 
@@ -52,7 +56,7 @@ class ClassDetails extends Component {
         // let rawData = convertToRaw(this.state.editorState.getCurrentContent());
         // console.log(rawData);
 
-        let rawText = convertToRaw(this.state.editorState.getCurrentContent());
+        let rawText = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
 
         await Promise.all(
             this.state.selectedFiles.map(async (fileObj, idx) => {
@@ -197,6 +201,7 @@ class ClassDetails extends Component {
 
     componentDidMount() {
         this.props.fetchClassContents(this.props.match.params.classId)
+        this.props.fetchClassComments(this.props.match.params.classId)
     }
     
     render() {
@@ -208,6 +213,8 @@ class ClassDetails extends Component {
         // console.log('class details > ', classDetails);
 
         // console.log(this.state.selectedFiles);
+
+        // console.log(this.props.classContents);
 
         let makeDisabled = false;
         if(!this.state.editorState.getCurrentContent().hasText()) {
@@ -241,6 +248,18 @@ class ClassDetails extends Component {
                 </div>
             )
         });
+
+        let classContents = this.props.classContents;
+        classContents = classContents.sort((a, b) => {
+            // console.log(a.value.posted_at, b.value.posted_at);
+            return new Date(b.value.posted_at) - new Date(a.value.posted_at)
+        });
+        
+        console.log(this.props.classComments);
+        
+        classContents = classContents.map(clsContent => (
+            <ClassContent key={clsContent.key} content={{...clsContent.value, contentId: clsContent.key}} />
+        ));
 
         return (
             <div className="root">
@@ -286,55 +305,7 @@ class ClassDetails extends Component {
                                     {progressList}
                             </div>}
                         </div>
-                        <div className="class-content border mt-4">
-                            <div className="publisher-info">
-                                <img width="50px" height="50px" className="rounded-circle" src="https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/s75-c-fbw=1/photo.jpg" alt="profile-pic" />    
-                                <div className="publisher-name ml-2">
-                                    <h5>Shahidur Rahman</h5>
-                                    <span>Jun 16</span>
-                                </div>
-                            </div>
-                            <div className="content-text mt-3">
-                                <p>Lecture on Security Technologies</p>
-                            </div>
-                            <div className="attached-contents">
-                                <div className="attached-content border">
-                                    <div className="attached-thumbnail">
-                                        <img width="100%" height="100%" src="https://play-lh.googleusercontent.com/nufRXPpDI9XP8mPdAvOoJULuBIH_OK4YbZZVu8i_-eDPulZpgb-Xp-EmI8Z53AlXHpqX" alt="thumbnail" />
-                                    </div>
-                                    <div className="attach-details">
-                                        <h5>Lecture 6.pdf</h5>
-                                        <p>PDF</p>
-                                    </div>
-                                </div>
-                                <div className="attached-content border">
-                                    <div className="attached-thumbnail">
-                                        <img width="100%" height="100%" src="https://play-lh.googleusercontent.com/nufRXPpDI9XP8mPdAvOoJULuBIH_OK4YbZZVu8i_-eDPulZpgb-Xp-EmI8Z53AlXHpqX" alt="thumbnail" />
-                                    </div>
-                                    <div className="attach-details">
-                                        <h5>Lecture 6.pdf</h5>
-                                        <p>PDF</p>
-                                    </div>
-                                </div>
-                                <div className="attached-content border">
-                                    <div className="attached-thumbnail">
-                                        <img width="100%" height="100%" src="https://play-lh.googleusercontent.com/nufRXPpDI9XP8mPdAvOoJULuBIH_OK4YbZZVu8i_-eDPulZpgb-Xp-EmI8Z53AlXHpqX" alt="thumbnail" />
-                                    </div>
-                                    <div className="attach-details">
-                                        <h5>Lecture 6.pdf</h5>
-                                        <p>PDF</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="border"></div>
-                            <div className="comment-form-box">
-                                <img width="30px" height="30px" className="rounded-circle" src="https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/s75-c-fbw=1/photo.jpg" alt="profile-pic" />    
-                                <div className="comment-input-container ml-2 border">
-                                    <input type="text" name="comment" placeholder="Add class comment" />
-                                    <FontAwesomeIcon icon={faPaperPlane} style={{margin: "20px", color: "#9AA0A6"}} />
-                                </div>  
-                            </div>
-                        </div>
+                        {classContents}
                     </div>
                 </div>
             </div>

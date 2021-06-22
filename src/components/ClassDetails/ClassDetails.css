@@ -119,7 +119,7 @@
 .publisher-info {
     display: flex;
     align-items: center;
-    margin: 20px;
+    margin: 5px 20px;
 }
 .publisher-name h5 {
     letter-spacing: .01785714em;
@@ -137,7 +137,7 @@
     line-height: 1.25rem;
 }
 .content-text {
-    margin: 20px;
+    margin: 0 20px;
 }
 .attached-contents {
     display: flex;

@@ -1,0 +1,49 @@
+.rdw-editor-toolbar {
+    display: none;
+}
+.comment {
+    display: flex;
+    align-items: center;
+    margin: 5px 20px;
+}
+.commenter {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+.commenter h5 {
+    letter-spacing: 0.00625em;
+    font-family: 'Google Sans',Roboto,Arial,sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5rem;
+    color: #3c4043;
+    margin: 0px;
+}
+.commenter h5 span {
+    margin-left: 2px;
+    letter-spacing: .025em;
+    font-family: Roboto,Arial,sans-serif;
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1rem;
+    color: #5f6368;
+    display: inline-block;
+}
+.total-comment {
+    display: flex;
+    align-items: center;
+    margin-left: 25px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+.total-comment span {
+    margin-left: 11px;
+    letter-spacing: .025em;
+    font-family: Roboto,Arial,sans-serif;
+    font-size: 19px;
+    font-weight: 400;
+    /* line-height: 1rem; */
+    color: #5f6368;
+    display: inline-block;
+}

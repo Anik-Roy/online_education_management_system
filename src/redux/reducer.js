@@ -4,7 +4,7 @@ const INITIAL_STATE = {
     token: null,
     userId: null,
     authLoading: false,
-    authFailedMessage: null,
+    authFailedMessage: '',
 
     isCreteClassModalOpen: false,
     isJoinClassModalOpen: false,
@@ -16,6 +16,8 @@ const INITIAL_STATE = {
     fetchSingleClassLoading: false,
     addClassContentLoading: false,
     fetchClassContentsLoading: false,
+    addClassCommentLoading: false,
+    fetchClassCommentsLoading: false,
 
     joinClassFailedMsg: "",
     joinedAlreadyMsg: "",
@@ -33,6 +35,7 @@ const INITIAL_STATE = {
     classDetails: null,
     classes: [],
     classContents: [],
+    classComments: [],
 }
 
 export const reducer = (state=INITIAL_STATE, action) => {
@@ -184,6 +187,31 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 ...state,
                 fetchClassContentsLoading: false,
                 classContents: action.payload
+            }
+        
+        case actionTypes.ADD_COMMENT_IN_CLASS_CONTENT_LOADING:
+            return {
+                ...state,
+                addClassCommentLoading: action.payload
+            }
+        
+        case actionTypes.ADD_COMMENT_IN_CLASS_CONTENT:
+            return {
+                ...state,
+                addClassCommentLoading: false,
+                classComments: state.classComments.concat(action.payload)
+            }
+        
+        case actionTypes.FETCH_CLASS_COMMENTS_LOADING:
+            return {
+                ...state,
+                fetchClassCommentsLoading: action.payload
+            }
+
+        case actionTypes.FETCH_CLASS_COMMENTS:
+            return {
+                ...state,
+                classComments: action.payload
             }
 
         case actionTypes.SELECTED_CLASS_TO_UNENROLL:
