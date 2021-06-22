@@ -3,18 +3,31 @@ import './ClassDetails.css';
 import '../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
-import { Button, Progress, Spinner, Alert } from 'reactstrap';
+import {
+    Collapse,
+    Navbar,
+    NavbarToggler,
+    Nav,
+    NavItem,
+    Button,
+    Progress,
+    Spinner,
+    Alert
+} from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperclip, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {connect} from 'react-redux';
 import {fetchSingleClass, addClassContent, fetchClassContents, fetchClassComments} from '../../redux/actionCreators';
 import { firebase, storage } from '../../firebase';
 import ClassContent from './ClassContent/ClassContent';
+import Classwork from './Classwork/Classwork';
+import People from './People/People';
 
 const mapStateToProps = state => {
     return {
         userId: state.userId,
         classDetails: state.classDetails,
+        fetchClassContentsLoading: state.fetchClassContentsLoading,
         addClassContentLoading: state.addClassContentLoading,
         addClassContentSuccessMsg: state.addClassContentSuccessMsg,
         addClassContentErrorMsg: state.addClassContentErrorMsg,
@@ -41,6 +54,10 @@ class ClassDetails extends Component {
             attachedFiles: [],
             submitBtnClicked: false,
             visible: true,
+            isNavOpen: false,
+            showStream: true,
+            showClasswork: false,
+            showPeople: false,
         };
     }
     
@@ -199,6 +216,47 @@ class ClassDetails extends Component {
         })
     }
 
+    toggleNav = () => {
+        this.setState({
+            ...this.state,
+            isNavOpen: !this.state.isNavOpen
+        })
+    }
+
+    alterSelectedNavitem = e => {
+        const navItem = e.target.innerText;
+        // console.log(item);
+        switch(navItem) {
+            case 'Stream':
+                this.setState({
+                    ...this.state,
+                    showStream: true,
+                    showClasswork: false,
+                    showPeople: false
+                });
+                break;
+            case 'Classwork':
+                this.setState({
+                    ...this.state,
+                    showStream: false,
+                    showClasswork: true,
+                    showPeople: false
+                });
+                break;
+            case 'People':
+                this.setState({
+                    ...this.state,
+                    showStream: false,
+                    showClasswork: false,
+                    showPeople: true
+                });
+                break;
+
+            default:
+                break;
+        }
+    }
+
     componentDidMount() {
         this.props.fetchClassContents(this.props.match.params.classId)
         this.props.fetchClassComments(this.props.match.params.classId)
@@ -207,14 +265,7 @@ class ClassDetails extends Component {
     render() {
         const { editorState } = this.state;
         const { classId } = this.props.match.params;
-        // const classDetails = this.props.classDetails;
         const classDetails = this.props.location.state.classDetails;
-
-        // console.log('class details > ', classDetails);
-
-        // console.log(this.state.selectedFiles);
-
-        // console.log(this.props.classContents);
 
         let makeDisabled = false;
         if(!this.state.editorState.getCurrentContent().hasText()) {
@@ -255,14 +306,14 @@ class ClassDetails extends Component {
             return new Date(b.value.posted_at) - new Date(a.value.posted_at)
         });
         
-        console.log(this.props.classComments);
-        
+        // console.log(this.props.classComments);
+
         classContents = classContents.map(clsContent => (
             <ClassContent key={clsContent.key} content={{...clsContent.value, contentId: clsContent.key}} />
         ));
 
-        return (
-            <div className="root">
+        let stream = (
+            <div>
                 <div className="banner-top">
                     <h3>{classDetails?.className}: {classDetails?.subject}</h3>
                     <h5>{classDetails?.firstName} {classDetails?.lastName}</h5>
@@ -305,9 +356,39 @@ class ClassDetails extends Component {
                                     {progressList}
                             </div>}
                         </div>
+                        {this.props.fetchClassContentsLoading && <div className="text-center"><Spinner className="mx-auto my-2" color="success" /></div>}
                         {classContents}
                     </div>
                 </div>
+            </div>
+        );
+
+        let classwork = (<Classwork />);
+
+        // console.log(classDetails);
+        let people = (<People classId={this.props.match.params.classId} classTeacher={classDetails?.firstName + ' ' + classDetails?.lastName} classTeacherId={classDetails?.user} />);
+
+        return (
+            <div className="root">
+                <Navbar color="faded" light expand="md">
+                    <NavbarToggler onClick={this.toggleNav} />
+                    <Collapse isOpen={this.state.isNavOpen} navbar>
+                        <Nav className="mx-auto" navbar>
+                            <NavItem onClick={this.alterSelectedNavitem} className={this.state.showStream ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                                Stream
+                            </NavItem>
+                            <NavItem onClick={this.alterSelectedNavitem} className={this.state.showClasswork ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                                Classwork
+                            </NavItem>
+                            <NavItem onClick={this.alterSelectedNavitem} className={this.state.showPeople ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                                People
+                            </NavItem>
+                        </Nav>
+                    </Collapse>
+                </Navbar>
+                {this.state.showStream && stream}
+                {this.state.showClasswork && classwork}
+                {this.state.showPeople && people}
             </div>
         );
     }

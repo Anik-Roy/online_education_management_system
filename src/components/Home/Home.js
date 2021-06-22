@@ -59,13 +59,18 @@ class Home extends Component {
 
     render() {
         // console.log(this.props.classes);
-        let classCards = this.props.classes.map(cls => {
+        let classes = this.props.classes;
+        classes = classes.sort((a, b) => {
+            return new Date(b.joined_at) - new Date(a.joined_at);
+        });
+
+        let classCards = classes.map(cls => {
             return <ClassCard key={cls.key} details={{...cls.value}} enrollId={cls.key} classCode={cls.classCode} unenrollClass={this.props.unenrollClass} />
         });
 
         return (
             <div className="mt-5">
-                {this.props.fetchClassLoading && <Spinner color="primary" className="ml-5" />}
+                {this.props.fetchClassLoading && <div className="text-center"><Spinner color="success" /></div>}
                 {this.props.fetchClassErrorMsg !== "" && this.props.fetchClassErrorMsg}
                 {this.props.unenrollClassSuccessMsg !== "" && <Alert color="success">{this.props.unenrollClassSuccessMsg}</Alert>}
                 {this.props.unenrollClassErrorMsg !== "" && <Alert color="danger">{this.props.unenrollClassErrorMsg}</Alert>}

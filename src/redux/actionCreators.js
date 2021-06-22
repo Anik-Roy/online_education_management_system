@@ -375,6 +375,7 @@ const fetchClassesFromClassCode = async data => {
 
         data_list.forEach(async ([key, value]) => {
             // classes.push({key: key, value: value});
+            // console.log(value.joined_at);
             promises.push(
                 axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/classes/${value.classCode}.json`)
                     .then(async response => {
@@ -391,7 +392,7 @@ const fetchClassesFromClassCode = async data => {
                                 class_teacher_info = {};
                             });
                         // console.log(class_teacher);
-                        classes.push({key: key, value: {...response.data, ...class_teacher_info}, classCode: value.classCode});
+                        classes.push({key: key, value: {...response.data, ...class_teacher_info}, joined_at: value.joined_at, classCode: value.classCode});
                     })
             );
         });
@@ -419,7 +420,7 @@ export const fetchClassError = errMsg => {
 export const fetchClass = userId => dispatch => {
     dispatch(fetchClassLoading(true));
     
-    axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json?orderBy="user_id"&equalTo="${userId}"&orderBy="joined_at"`)
+    axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json?orderBy="user_id"&equalTo="${userId}"`)
         .then(response => {
             // console.log(response.data);
             fetchClassesFromClassCode(response.data)
@@ -789,7 +790,7 @@ export const fetchClassComments = clsId => dispatch => {
         .then(response => {
             // console.log(response.data);
             fetchClassCommentsSuccess(response.data).then(clsComments => {
-                console.log(clsComments);
+                // console.log(clsComments);
                 dispatch({
                     type: actionTypes.FETCH_CLASS_COMMENTS,
                     payload: clsComments
@@ -802,7 +803,6 @@ export const fetchClassComments = clsId => dispatch => {
         });
 }
 
-/*
 export const fetchClassStudentsLoading = isLoading => {
     return {
         type: actionTypes.FETCH_CLASS_STUDENTS_LOADING,
@@ -827,8 +827,34 @@ export const fetchClassStudentsSuccess = data => {
 export const fetchClassStudents = classCode => dispatch => {
     dispatch(fetchClassStudentsLoading(true));
     axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json?orderBy="classCode"&equalTo="${classCode}"`)
-        .then(response => {
-            let data_list = Object.keys(response.data).map(key => {return {key, value: response.data[key]}});
+        .then(async response => {
+            // let data_list = Object.keys(response.data).map(key => {
+            //     let userId = response.data[key].user_id;
+            //     console.log(userId);
+            //     return {key, value: response.data[key]}}
+            // );
+            let data_list = [];
+
+            await Promise.all(
+                Object.keys(response.data).map(async key => {
+                    let userId = response.data[key].user_id;
+                    console.log(userId);
+                    await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`)
+                        .then(response => {
+                            data_list.push({
+                                key: userId,
+                                value: response.data
+                            })
+                        }).catch(error => {
+                            console.log(error);
+                        });
+                })
+            ).then(() => {
+                console.log(data_list);
+                dispatch(fetchClassStudentsSuccess(data_list));
+            }).catch(error => {
+                console.log(error);
+            });
             // console.log(data_list);
             dispatch(fetchClassStudentsSuccess(data_list));
         })
@@ -837,4 +863,3 @@ export const fetchClassStudents = classCode => dispatch => {
             dispatch(fetchClassStudentsError(error));
         });
 }
-*/

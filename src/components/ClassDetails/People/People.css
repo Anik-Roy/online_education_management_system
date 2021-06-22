@@ -1,0 +1,12 @@
+.people-root {
+    width: 80%;
+    margin: 0 auto;
+}
+.teacher div span {
+    letter-spacing: .01785714em;
+    /* font-family: 'Google Sans',Roboto,Arial,sans-serif; */
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    color: #3c4043;
+}

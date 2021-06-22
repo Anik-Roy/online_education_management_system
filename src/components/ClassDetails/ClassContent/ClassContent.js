@@ -30,8 +30,6 @@ const ClassContent = props => {
     let [ showComment, setShowComment ] = useState(false);
     let [ showLoadingInContent, setShowLoadingInContent] = useState(null);
 
-    console.log(showLoadingInContent);
-
     // console.log(content);
     let posted_at = new Date(content.posted_at);
 
@@ -55,19 +53,19 @@ const ClassContent = props => {
     let attachedFiles = content.attachedFileUrls.map((attachedFile, idx) => {
         return (
             <a key={`attached-file-${idx}`} href={attachedFile.downloadURL} target="_blank" rel="noreferrer" className="attached-content border text-success text-decoration-none">
-                {props.fetchClassContentsLoading && <Spinner color="primary" />}
+                {props.fetchClassContentsLoading && <div className="text-center"><Spinner color="success" /></div>}
                 <div className="attached-thumbnail">
                     {/* <img width="100%" height="100%" src="https://play-lh.googleusercontent.com/nufRXPpDI9XP8mPdAvOoJULuBIH_OK4YbZZVu8i_-eDPulZpgb-Xp-EmI8Z53AlXHpqX" alt="thumbnail" /> */}
-                    {attachedFile.type.includes('video') && <video width="100%" height="100%">
+                    {attachedFile.type.includes('video') && <video>
                         <source src={attachedFile.downloadURL} type={attachedFile.type} />
                         Your browser does not support the video tag.
                     </video>}
-                    {attachedFile.type.includes('image') && <img width="100%" height="100%" src={attachedFile.downloadURL} alt="file" />}
-                    {!attachedFile.type.includes('video') && !attachedFile.type.includes('image') && <img width="100%" height="100%" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/File_alt_font_awesome.svg/512px-File_alt_font_awesome.svg.png" alt="file" />}
+                    {attachedFile.type.includes('image') && <img src={attachedFile.downloadURL} alt="file" />}
+                    {!attachedFile.type.includes('video') && !attachedFile.type.includes('image') && <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/File_alt_font_awesome.svg/512px-File_alt_font_awesome.svg.png" alt="file" />}
                     
                 </div>
                 <div className="attach-details">
-                    <h5>{attachedFile.fileName}</h5>
+                    <h5>{attachedFile.fileName.substring(0, 9)}...</h5>
                     <p>{attachedFile.type}</p>
                 </div>
             </a>

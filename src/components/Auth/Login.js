@@ -24,6 +24,7 @@ const mapDispatchToProps = dispatch => {
 
 class Login extends Component {
     render() {
+        console.log(this.props.authFailedMessage);
         return (
             <div style={{margin: "0 auto", padding: "20px", width: "700px"}}>
                 <h3 className="text-center text-success my-5">Login to join/create classes</h3>

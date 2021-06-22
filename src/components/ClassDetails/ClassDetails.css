@@ -142,36 +142,48 @@
 .attached-contents {
     display: flex;
     flex-wrap: wrap;
+    width: 100%;
 }
-.attached-contents > * {
+/* .attached-contents > * {
+    display: flex;
+    flex: 46%;
+    height: 150px;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin: 2%;
+} */
+.attached-content {
     display: flex;
     flex: 46%;
     height: 100%;
     align-items: center;
+    flex-wrap: wrap;
     margin: 2%;
 }
-/* .attached-content {
-    display: flex;
-    flex: 50%;
-    height: 100%;
-    align-items: center;
-    margin: 10px;
-} */
 .attached-thumbnail {
-    width: 200px;
-    height: 100px;
+    width: 30%;
+    height: 100%;
+    /* width: 30%;
+    height: 100%; */
+}
+.attached-thumbnail > * {
+    width: 100%;
+    height: 100%;
 }
 .attach-details {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    /* width: 50%; */
     padding: 10px;
+    overflow: hidden;
 }
 /* Responsive layout - makes a two column-layout instead of four columns */
 @media (max-width: 800px) {
     .attached-contents > * {
-        flex: 50%;
-        max-width: 50%;
+        flex: 100%;
+        max-width: 100%;
     }
 }
 

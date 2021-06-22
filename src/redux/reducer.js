@@ -13,11 +13,12 @@ const INITIAL_STATE = {
     isCreateClassLoading: false,
     isJoinClassLoading: false,
     fetchClassLoading: false,
+    fetchClassContentsLoading: false,
     fetchSingleClassLoading: false,
     addClassContentLoading: false,
-    fetchClassContentsLoading: false,
     addClassCommentLoading: false,
     fetchClassCommentsLoading: false,
+    fetchClassStudentsLoading: false,
 
     joinClassFailedMsg: "",
     joinedAlreadyMsg: "",
@@ -25,6 +26,7 @@ const INITIAL_STATE = {
     fetchSingleClassErrorMsg: "",
     addClassContentSuccessMsg: "",
     addClassContentErrorMsg: "",
+    fetchClassStudentsErrorMsg: "",
 
     selectedClassToUnenroll: null,
     unenrollClassSuccessMsg: "",
@@ -36,6 +38,7 @@ const INITIAL_STATE = {
     classes: [],
     classContents: [],
     classComments: [],
+    classStudents: []
 }
 
 export const reducer = (state=INITIAL_STATE, action) => {
@@ -54,7 +57,7 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 ...state,
                 token: null,
                 userId: null,
-                authFailedMessage: null,
+                authFailedMessage: '',
             }
         
         case actionTypes.AUTH_LOADING:
@@ -213,7 +216,25 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 ...state,
                 classComments: action.payload
             }
+        
+        case actionTypes.FETCH_CLASS_STUDENTS_LOADING:
+            return {
+                ...state,
+                fetchClassStudentsLoading: action.payload
+            }
 
+        case actionTypes.FETCH_CLASS_STUDENTS_ERROR:
+            return {
+                ...state,
+                fetchClassStudentsErrorMsg: action.payload
+            }
+
+        case actionTypes.FETCH_CLASS_STUDENTS:
+            return {
+                ...state,
+                classStudents: action.payload
+            }
+            
         case actionTypes.SELECTED_CLASS_TO_UNENROLL:
             return {
                 ...state,
