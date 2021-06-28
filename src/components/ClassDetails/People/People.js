@@ -42,6 +42,8 @@ class People extends Component {
                         <span className="ml-4">{this.props.classTeacher}</span>
                     </div>
                 </div>
+
+                {/* Student */}
                 <div  className="teacher mt-5">
                     <h3 className="text-primary mb-4 p-2 border-bottom border-primary">Classmates <span className="float-right">{peoples.length - 1} students</span></h3>
                     {peoples}

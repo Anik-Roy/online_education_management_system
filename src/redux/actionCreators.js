@@ -266,7 +266,6 @@ export const joinClassFailed = errMsg => {
     }
 }
 
-
 const alreadyJoined = async (classCode, userId) => {
     let response = await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json?orderBy="user_id"&equalTo="${userId}"`);
     for(let key in response.data) {
@@ -630,7 +629,6 @@ export const addClassContent = (rawText, attachedFileUrls, classId, userId) => d
     //     })
 }
 
-
 export const fetchClassContentsLoading = isLoading => {
     return {
         type: actionTypes.FETCH_CLASS_CONTENTS_LOADING,
@@ -699,6 +697,32 @@ export const fetchClassContents = classId => dispatch => {
         .catch(error => {
             console.log(error);
         })
+}
+
+export const deleteClassContentLoading = isLoading => {
+    return {
+        type: actionTypes.DELETE_CLASS_CONTENT_LOADING,
+        payload: isLoading
+    }
+}
+
+export const deleteClassContentSuccess = contentId => {
+    return {
+        type: actionTypes.DELETE_CLASS_CONTENT,
+        payload: contentId
+    }
+}
+
+export const deleteClassContent = contentId => dispatch => {
+    dispatch(deleteClassContentLoading(true));
+    axios.delete(`https://sust-online-learning-default-rtdb.firebaseio.com/class_contents/${contentId}.json`)
+        .then(response => {
+            console.log(response.data);
+            dispatch(deleteClassContentSuccess(contentId));
+        })
+        .catch(error => {
+            console.log(error);
+        });
 }
 
 export const addClassCommentLoading = isLoading => {
@@ -772,14 +796,8 @@ export const fetchClassCommentsSuccess = async classComments => {
             })
             .catch(error => {
                 console.log(error);
-            })
-        // clsComments.push({key, ...classComments[key]})
+            });
     }
-    // console.log(clsComments);
-    // return {
-    //     type: actionTypes.FETCH_CLASS_COMMENTS,
-    //     payload: clsComments
-    // }
     return clsComments;
 }
 
@@ -795,11 +813,36 @@ export const fetchClassComments = clsId => dispatch => {
                     type: actionTypes.FETCH_CLASS_COMMENTS,
                     payload: clsComments
                 });
-            })
-            // dispatch(fetchClassCommentsSuccess(response.data));
+            });
         })
         .catch(error => {
             console.log(error);;
+        });
+}
+
+export const deleteCommentFromContentLoading = isLoading => {
+    return {
+        type: actionTypes.DELETE_COMMENT_FROM_CONTENT_LOADING,
+        payload: isLoading
+    }
+}
+
+export const deleteCommentFromContentSuccess = commentId => {
+    return {
+        type: actionTypes.DELETE_COMMENT_FROM_CONTENT,
+        payload: commentId
+    }
+}
+
+export const deleteCommentFromContent = commentId => dispatch => {
+    dispatch(deleteCommentFromContentLoading(true));
+    axios.delete(`https://sust-online-learning-default-rtdb.firebaseio.com/comments/${commentId}.json`)
+        .then(response => {
+            console.log(response.data);
+            dispatch(deleteCommentFromContentSuccess(commentId));
+        })
+        .catch(error => {
+            console.log(error);
         });
 }
 
@@ -828,17 +871,12 @@ export const fetchClassStudents = classCode => dispatch => {
     dispatch(fetchClassStudentsLoading(true));
     axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json?orderBy="classCode"&equalTo="${classCode}"`)
         .then(async response => {
-            // let data_list = Object.keys(response.data).map(key => {
-            //     let userId = response.data[key].user_id;
-            //     console.log(userId);
-            //     return {key, value: response.data[key]}}
-            // );
             let data_list = [];
 
             await Promise.all(
                 Object.keys(response.data).map(async key => {
                     let userId = response.data[key].user_id;
-                    console.log(userId);
+                    // console.log(userId);
                     await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`)
                         .then(response => {
                             data_list.push({
@@ -850,16 +888,24 @@ export const fetchClassStudents = classCode => dispatch => {
                         });
                 })
             ).then(() => {
-                console.log(data_list);
+                // console.log(data_list);
                 dispatch(fetchClassStudentsSuccess(data_list));
             }).catch(error => {
                 console.log(error);
             });
             // console.log(data_list);
-            dispatch(fetchClassStudentsSuccess(data_list));
+            // dispatch(fetchClassStudentsSuccess(data_list));
         })
         .catch(error => {
             console.log(error);
             dispatch(fetchClassStudentsError(error));
         });
+}
+
+export const showCommentPosting = contentId => {
+    console.log(contentId);
+    return {
+        type: actionTypes.SHOW_COMMENT_POSTING_INDICATOR,
+        payload: contentId
+    }
 }

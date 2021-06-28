@@ -31,6 +31,7 @@ const mapStateToProps = state => {
         addClassContentLoading: state.addClassContentLoading,
         addClassContentSuccessMsg: state.addClassContentSuccessMsg,
         addClassContentErrorMsg: state.addClassContentErrorMsg,
+        deleteClassContentSuccessMsg: state.deleteClassContentSuccessMsg,
         classContents: state.classContents,
         classComments: state.classComments
     }
@@ -280,7 +281,7 @@ class ClassDetails extends Component {
             return fileObj?.progress === 100 ? null : <Progress className="m-2" key={`progress-${idx}`} value={fileObj?.progress} />
         });
 
-        let attachedFiles = this.state.attachedFiles.map((fileUrlObj, idx) => {
+        let attachedFiles = this.state.attachedFiles.length > 0 && this.state.attachedFiles.map((fileUrlObj, idx) => {
             return (
                 <div key={`uploaded-file-${idx}`} className="upload-file-container">
                     <a href={fileUrlObj.downloadURL} target="_blank" rel="noreferrer" className="uploaded-file">
@@ -306,7 +307,7 @@ class ClassDetails extends Component {
             return new Date(b.value.posted_at) - new Date(a.value.posted_at)
         });
         
-        // console.log(this.props.classComments);
+        console.log(this.props.classContents);
 
         classContents = classContents.map(clsContent => (
             <ClassContent key={clsContent.key} content={{...clsContent.value, contentId: clsContent.key}} />

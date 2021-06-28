@@ -19,6 +19,8 @@ const INITIAL_STATE = {
     addClassCommentLoading: false,
     fetchClassCommentsLoading: false,
     fetchClassStudentsLoading: false,
+    deleteClassContentLoading: false,
+    deleteCommentFromContentLoading: false,
 
     joinClassFailedMsg: "",
     joinedAlreadyMsg: "",
@@ -27,12 +29,16 @@ const INITIAL_STATE = {
     addClassContentSuccessMsg: "",
     addClassContentErrorMsg: "",
     fetchClassStudentsErrorMsg: "",
+    deleteClassContentSuccessMsg: "",
+    deleteClassContentErrorMsg: "",
 
     selectedClassToUnenroll: null,
     unenrollClassSuccessMsg: "",
     unenrollClassErrorMsg: "",
 
     unenrollClassLoading: false,
+
+    showCommentPostingIndicator: null,
 
     classDetails: null,
     classes: [],
@@ -192,6 +198,20 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 classContents: action.payload
             }
         
+        case actionTypes.DELETE_CLASS_CONTENT_LOADING:
+            return {
+                ...state,
+                deleteClassContentLoading: action.payload
+            }
+
+        case actionTypes.DELETE_CLASS_CONTENT:
+            return {
+                ...state,
+                deleteClassContentLoading: false,
+                deleteClassContentSuccessMsg: "Class deleted successfully!",
+                classContents: state.classContents.filter(content => content.key !== action.payload)
+            }
+
         case actionTypes.ADD_COMMENT_IN_CLASS_CONTENT_LOADING:
             return {
                 ...state,
@@ -205,6 +225,12 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 classComments: state.classComments.concat(action.payload)
             }
         
+        case actionTypes.SHOW_COMMENT_POSTING_INDICATOR:
+            return {
+                ...state,
+                showCommentPostingIndicator: action.payload
+            }
+            
         case actionTypes.FETCH_CLASS_COMMENTS_LOADING:
             return {
                 ...state,
@@ -217,6 +243,19 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 classComments: action.payload
             }
         
+        case actionTypes.DELETE_COMMENT_FROM_CONTENT_LOADING:
+            return {
+                ...state,
+                deleteCommentFromContentLoading: action.payload
+            }
+        
+        case actionTypes.DELETE_COMMENT_FROM_CONTENT:
+            return {
+                ...state,
+                deleteCommentFromContentLoading: false,
+                classComments: state.classComments.filter(comment => comment.key !== action.payload)
+            }
+
         case actionTypes.FETCH_CLASS_STUDENTS_LOADING:
             return {
                 ...state,
@@ -263,6 +302,7 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 unenrollClassSuccessMsg: "",
                 unenrollClassErrorMsg: action.payload,
             }
+
         default:
             return state;
     }

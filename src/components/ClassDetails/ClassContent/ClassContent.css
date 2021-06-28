@@ -1,10 +1,15 @@
-.rdw-editor-toolbar {
+.content-container .rdw-editor-toolbar {
     display: none;
 }
 .comment {
     display: flex;
     align-items: center;
     margin: 5px 20px;
+}
+.comment-posting {
+    margin-left: 62px;
+    margin-top: -15px;
+    color: rgba(0,0,0,0.549);
 }
 .commenter {
     display: flex;
