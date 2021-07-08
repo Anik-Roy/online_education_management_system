@@ -11,6 +11,7 @@ class Classwork extends Component {
                 <div className="class-work-info">
                     <p>Assign work to your class here</p>
                     <a href='https://forms.gle/fUoccpHrJC4frYge9'>Go there for exam</a>
+                    <p>Hello World!</p>
                     <ul className="class-work-info-list">
                         <li className="class-work-info-list-item">
                             <FontAwesomeIcon icon={faFileAlt} className="mr-3" />
