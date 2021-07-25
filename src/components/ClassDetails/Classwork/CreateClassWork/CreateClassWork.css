@@ -1,0 +1,68 @@
+.root-create-class-work {
+    width: 70%;
+    margin: 0 auto;
+}
+.class-work-info {
+    margin: 0 auto;
+    padding: 25px;
+    border: 0.0625rem solid #dadce0;
+    border-radius: 0.5rem;
+}
+.class-work-info p {
+    color: #202124;
+    padding-bottom: 0.5rem;
+    font-family: 'Noto Sans JP',Roboto,Arial,sans-serif;
+    font-size: 1.375rem;
+    font-weight: 700;
+    line-height: 1.75rem;
+    color: #3c4043;
+}
+.class-work-info-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+.class-work-info-list-item {
+    margin: 10px 0;
+    font-size: 20px;
+}
+.my-custom-modal {
+    width: 100vw!important;
+    height: auto;
+    min-height: 100vh!important;
+}
+.my-modal-dialog {
+    margin: 0px!important;
+}
+.quiz-left-container {
+    width: 75%;
+    margin: 10px;
+}
+.quiz-right-container {
+    width: 25%;
+}
+.quiz-input-container {
+    border: 1px solid #ddd;
+}
+#quiz input {
+    vertical-align: middle;
+}
+#quiz {
+    font-size: 14px; 
+     /* Georgia, serif; */
+}
+#quiz ol {
+   margin: 0 0 10px 20px;
+}
+#quiz ol li {
+   margin: 0 0 20px 0;
+}
+#quiz ol li div {
+   padding: 4px 0;
+}
+#quiz h3 {
+   font-size: 17px; margin: 0 0 1px 0; color: #666;
+}
+.close {
+    margin-right: 20px!important;
+}

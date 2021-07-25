@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {toogleClassModal, toogleJoinClassModal, logout} from '../../redux/actionCreators';
 import {
-    Collapse,
+  Collapse,
   Navbar,
   NavbarToggler,
   NavbarBrand,

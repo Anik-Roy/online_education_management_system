@@ -364,7 +364,7 @@ class ClassDetails extends Component {
             </div>
         );
 
-        let classwork = (<Classwork />);
+        let classwork = (<Classwork clsId={classId} />);
 
         // console.log(classDetails);
         let people = (<People classId={this.props.match.params.classId} classTeacher={classDetails?.firstName + ' ' + classDetails?.lastName} classTeacherId={classDetails?.user} />);

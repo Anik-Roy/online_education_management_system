@@ -909,3 +909,23 @@ export const showCommentPosting = contentId => {
         payload: contentId
     }
 }
+
+export const createQuizLoading = isLoading => {
+    return {
+        type: actionTypes.CREATE_QUIZ_LOADING,
+        payload: isLoading
+    }
+}
+
+export const createQuiz = quiz_data => dispatch => {
+    console.log(quiz_data);
+    dispatch(createQuizLoading(true));
+
+    axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/quizes.json`, quiz_data)
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+}
