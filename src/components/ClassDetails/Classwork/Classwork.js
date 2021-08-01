@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './Classwork.css';
 import CreateClassWork from './CreateClassWork/CreateClassWork';
+import QuizList from './QuizList/QuizList';
 
 class Classwork extends Component {
     // constructor(props) {
@@ -14,6 +15,8 @@ class Classwork extends Component {
                 {/* create classwork */}
                 <CreateClassWork clsId={this.props.clsId} />
                 
+                {/* quiz list */}
+                <QuizList clsId={this.props.clsId} />
             </div>
         );
     }

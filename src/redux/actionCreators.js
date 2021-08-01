@@ -929,3 +929,37 @@ export const createQuiz = quiz_data => dispatch => {
             console.log(error);
         });
 }
+
+export const fetchQuizesLoading = isLoading => {
+    return {
+        type: actionTypes.FETCH_QUIZES_LOADING,
+        payload: isLoading
+    }
+}
+
+export const fetchQuizesSuccess = data => {
+    return {
+        type: actionTypes.FETCH_QUIZES,
+        payload: data
+    }
+}
+
+export const fetchQuizes = clsId => dispatch => {
+    dispatch(fetchQuizesLoading(true));
+
+    axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/quizes.json?orderBy="class_id"&equalTo="${clsId}"`)
+        .then(response => {
+            // console.log(response.data);
+            let classQuizes = [];
+            Object.keys(response.data).map(key => {
+                classQuizes.push({key: key, data: response.data[key]});
+                // return console.log(key, response.data[key]);
+                return true;
+            });
+            // console.log(classQuizes);
+            dispatch(fetchQuizesSuccess(classQuizes));
+        })
+        .catch(error => {
+            console.log(error);
+        });
+}

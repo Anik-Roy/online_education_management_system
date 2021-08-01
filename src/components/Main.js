@@ -46,6 +46,7 @@ class Main extends Component {
                     <Route exact path="/" component={Home} />
                     {/* <Route exact path="/" component={ClassDetails} /> */}
                     <Route path="/class/:classId" component={ClassDetails} />
+                    {/* <Route path="/class/:classId" render={props => (<ClassDetails {...props} clsId={props.match.params.classId} />)} /> */}
                     <Route path="/logout" component={Logout} />
                     <Redirect to="/" />
                 </Switch>

@@ -44,7 +44,9 @@ const INITIAL_STATE = {
     classes: [],
     classContents: [],
     classComments: [],
-    classStudents: []
+    classStudents: [],
+
+    classQuizes: [],
 }
 
 export const reducer = (state=INITIAL_STATE, action) => {
@@ -302,7 +304,13 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 unenrollClassSuccessMsg: "",
                 unenrollClassErrorMsg: action.payload,
             }
-
+        
+        case actionTypes.FETCH_QUIZES:
+            return {
+                ...state,
+                classQuizes: action.payload,
+            }
+            
         default:
             return state;
     }

@@ -96,7 +96,7 @@ const ClassContent = props => {
 
     classComments = classComments.map(comment => {
         let posted_at = new Date(comment.posted_at);
-        console.log(comment.userId);
+        // console.log(comment.userId);
         return (
             <div key={comment.key} className="comment">
                 <img width="30px" height="30px" className="rounded-circle" src="https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/s75-c-fbw=1/photo.jpg" alt="profile-pic" />

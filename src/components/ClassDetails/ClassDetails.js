@@ -266,6 +266,8 @@ class ClassDetails extends Component {
     render() {
         const { editorState } = this.state;
         const { classId } = this.props.match.params;
+        // const classId = this.props.clsId;
+
         const classDetails = this.props.location.state.classDetails;
 
         let makeDisabled = false;
