@@ -21,6 +21,9 @@ const INITIAL_STATE = {
     fetchClassStudentsLoading: false,
     deleteClassContentLoading: false,
     deleteCommentFromContentLoading: false,
+    fetchQuizesLoading: false,
+    quizSubmissionLoading: false,
+    fetchQuizResponsesLoading: false,
 
     joinClassFailedMsg: "",
     joinedAlreadyMsg: "",
@@ -36,6 +39,12 @@ const INITIAL_STATE = {
     unenrollClassSuccessMsg: "",
     unenrollClassErrorMsg: "",
 
+    quizSubmissionSuccessMsg: "",
+    quizSubmissionErrorMsg: "",
+
+    fetchQuizResponsesSuccessMsg: "",
+    fetchQuizResponsesErrorMsg: "",
+
     unenrollClassLoading: false,
 
     showCommentPostingIndicator: null,
@@ -47,6 +56,8 @@ const INITIAL_STATE = {
     classStudents: [],
 
     classQuizes: [],
+
+    quizResponses: []
 }
 
 export const reducer = (state=INITIAL_STATE, action) => {
@@ -305,10 +316,54 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 unenrollClassErrorMsg: action.payload,
             }
         
+        case actionTypes.FETCH_QUIZES_LOADING:
+            return {
+                ...state,
+                fetchQuizesLoading: action.payload
+            }
         case actionTypes.FETCH_QUIZES:
             return {
                 ...state,
                 classQuizes: action.payload,
+            }
+            
+        case actionTypes.SUBMIT_QUIZ_LOADING:
+            return {
+                ...state,
+                quizSubmissionLoading: action.payload,
+                quizSubmissionSuccessMsg: '',
+                quizSubmissionErrorMsg: ''
+            }
+        
+        case actionTypes.SUBMIT_QUIZ:
+            return {
+                ...state,
+                quizSubmissionSuccessMsg: "Your response has been recorded!",
+                quizSubmissionErrorMsg: ''
+            }
+        case actionTypes.SUBMIT_QUIZ_ERROR:
+            return {
+                ...state,
+                quizSubmissionErrorMsg: "Sorry! Your response cannot be recorded at that time! Try again!",
+                quizSubmissionSuccessMsg: ''
+            }
+
+        case actionTypes.FETCH_QUIZ_RESPONSES_LOADING:
+            return {
+                ...state,
+                fetchQuizResponsesLoading: action.payload
+            }
+        
+        case actionTypes.FETCH_QUIZ_RESPONSES:
+            return {
+                ...state,
+                quizResponses: action.payload
+            }
+        
+        case actionTypes.FETCH_QUIZ_RESPONSES_ERROR:
+            return {
+                ...state,
+                fetchQuizResponsesErrorMsg: 'An error occured duing fetching the responses of the quiz! Try again!'
             }
             
         default:

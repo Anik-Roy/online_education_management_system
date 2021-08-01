@@ -3,7 +3,7 @@ import './CreateClassWork.css';
 import { EditorState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faFileAlt, faTable, faSort, faPlus, faAlignLeft} from '@fortawesome/free-solid-svg-icons';
+import {faFileAlt, faPlus, faAlignLeft} from '@fortawesome/free-solid-svg-icons';
 import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Modal, ModalHeader, ModalBody, ModalFooter, Input} from 'reactstrap';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -157,25 +157,6 @@ class CreateClassWork extends Component {
                         <DropdownItem onClick={this.onCreateClassClick} value="Quiz">Quiz</DropdownItem>
                     </DropdownMenu>
                 </ButtonDropdown>
-
-                <div className="class-work-info">
-                    <p>Assign work to your class here</p>
-                    {/* <a href='https://forms.gle/fUoccpHrJC4frYge9'>Go there for exam</a> */}
-                    <ul className="class-work-info-list">
-                        <li className="class-work-info-list-item">
-                            <FontAwesomeIcon icon={faFileAlt} className="mr-3" />
-                            Create assignments and questions
-                        </li>
-                        <li className="class-work-info-list-item">
-                            <FontAwesomeIcon icon={faTable} className="mr-3" />
-                            Use topics to organize classwork into modules or units
-                        </li>
-                        <li className="class-work-info-list-item">
-                            <FontAwesomeIcon icon={faSort} className="mr-3" />
-                            Order work the way you want students to see it
-                        </li>
-                    </ul>
-                </div>
 
                 {/* quiz modal */}
                 <Modal isOpen={this.state.quizModalOpen} contentClassName="my-custom-modal" toggle={this.toogleQuizModal} className='my-modal-dialog'>

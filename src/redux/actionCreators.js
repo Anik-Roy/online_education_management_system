@@ -963,3 +963,80 @@ export const fetchQuizes = clsId => dispatch => {
             console.log(error);
         });
 }
+
+export const submitQuizLoading = isLoading => {
+    return {
+        type: actionTypes.SUBMIT_QUIZ_LOADING,
+        payload: isLoading
+    }
+}
+
+export const submitQuizError = errMsg => {
+    return {
+        type: actionTypes.SUBMIT_QUIZ_ERROR,
+        payload: errMsg
+    }
+}
+
+export const submitQuizSuccess = () => {
+    return {
+        type: actionTypes.SUBMIT_QUIZ
+    }
+}
+
+export const submitQuiz = user_response => dispatch => {
+    dispatch(submitQuizLoading(true));
+
+    axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/quiz_responses.json`, user_response)
+        .then(response => {
+            console.log(response);
+            dispatch(submitQuizLoading(false));
+            dispatch(submitQuizSuccess());
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(submitQuizError(error))
+        });
+}
+
+export const fetchQuizResponseLoading = isLoading => {
+    return {
+        type: actionTypes.FETCH_QUIZ_RESPONSES_LOADING,
+        payload: isLoading
+    }
+}
+
+export const fetchQuizResponsesSuccess = data => {
+    return {
+        type: actionTypes.FETCH_QUIZ_RESPONSES,
+        payload: data
+    }
+}
+
+export const fetchQuizResponsesError = errorMsg => {
+    return {
+        type: actionTypes.FETCH_QUIZ_RESPONSES_ERROR,
+        payload: errorMsg
+    }
+}
+
+export const fetchQuizResponses = quiz_id => dispatch => {
+    dispatch(fetchQuizResponseLoading(true));
+    axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/quiz_responses.json?orderBy="quiz_id"&equalTo="${quiz_id}"`)
+        .then(response => {
+            // console.log(response);
+            let quiz_responses = [];
+
+            Object.keys(response.data).map(key => (
+                quiz_responses.push({...response.data[key], key})
+            ));
+            // console.log(quiz_responses);
+            dispatch(fetchQuizResponseLoading(false));
+            dispatch(fetchQuizResponsesSuccess(quiz_responses));
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(fetchQuizResponseLoading(false));
+            dispatch(fetchQuizResponsesError(error));
+        });
+}
