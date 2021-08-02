@@ -64,11 +64,11 @@ class QuizDetails extends Component {
     }
 
     render() {
-        const {classId, quizId} = this.props.match.params;
+        const {quizId} = this.props.match.params;
         const {quizDetails} = this.props.location.state;
 
         let quiz_content = <QuizContent quizId={quizId} quizDetails={quizDetails} />
-        let quiz_responses = <QuizResponses quizId={quizId} />
+        let quiz_responses = <QuizResponses quizId={quizId} quizDetails={quizDetails} />
         let quiz_chart = <QuizChart />
 
         return (

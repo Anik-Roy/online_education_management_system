@@ -51,27 +51,43 @@ class QuizContent extends Component {
 
         // console.log('Submission canceled!');
     }
+    
     render() {
+        let dueDate = new Date(this.props.quizDetails.data.dueDate);
+        let currentDate = new Date();
+        // console.log(dueDate, currentDate);
+        
+        let dateOverMsg = '';
+
+        if(currentDate > dueDate) {
+            // console.log('Due date is over!');
+            dateOverMsg = 'Due date is over!';
+        } else {
+            console.log('You can participate in this tutorial!');
+        }
+
+        let checkboxDisabled = dateOverMsg === "" ? false : true;
+
         let quiz_questions = this.props.quizDetails.data.quiz_questions.map((question, idx) => (
             <li key={`quizquestion-${idx}`} className="card mt-2 p-3" style={{backgroundColor: '#fac66b'}}>
                 <h3 className="card-title text-dark font-weight-bold">{idx+1}. {question.question}</h3>
                 <div>
-                    <Field type="radio" name={idx} id={`question-${idx}-answers-1`} value="option1" />
+                    <Field disabled={checkboxDisabled} type="radio" name={idx} id={`question-${idx}-answers-1`} value="option1" />
                     <label htmlFor={`question-${idx}-answers-1`}>&nbsp;{question.option1}</label>
                 </div>
 
                 <div>
-                    <Field type="radio" name={idx} id={`question-${idx}-answers-2`} value="option2" />
+                    <Field disabled={checkboxDisabled} type="radio" name={idx} id={`question-${idx}-answers-2`} value="option2" />
                     <label htmlFor={`question-${idx}-answers-2`}>&nbsp;{question.option2}</label>
                 </div>
 
                 <div>
-                    <Field type="radio" name={idx} id={`question-${idx}-answers-3`} value="option3" />
+                    <Field disabled={checkboxDisabled} type="radio" name={idx} id={`question-${idx}-answers-3`} value="option3" />
                     <label htmlFor={`question-${idx}-answers-3`}>&nbsp;{question.option3}</label>
                 </div>
 
                 <div>
-                    <Field type="radio" name={idx} id={`question-${idx}-answers-4`} value="option4" />
+                    <Field disabled={checkboxDisabled} type="radio" name={idx} id={`question-${idx}-answers-4`} value="option4" />
                     <label htmlFor={`question-${idx}-answers-4`}>&nbsp;{question.option4}</label>
                 </div>
                 <div>
@@ -92,6 +108,8 @@ class QuizContent extends Component {
                 {this.props.quizSubmissionSuccessMsg && <Alert color="success">{this.props.quizSubmissionSuccessMsg}</Alert>}
                 {this.props.quizSubmissionErrorMsg && <Alert color="danger">{this.props.quizSubmissionErrorMsg}</Alert>}
                 <h3 className="text-center m-3">Take participate in the {this.props.quizDetails.data.title}</h3>
+                {dateOverMsg !== "" && <h3 className="text-info text-center">Due date was {dueDate.toString()}!<br/> You can no longer participate in this tutorial.</h3>}
+
                 <Formik
                     initialValues={
                         formik_initial_values
@@ -110,7 +128,7 @@ class QuizContent extends Component {
                                         </ol>
                                     </div>
                                     <div className="text-center mb-3">
-                                        <button className="btn btn-primary" type="submit">Submit</button>
+                                        <button disabled={checkboxDisabled} className="btn btn-primary" type="submit">Submit</button>
                                     </div>
                                 </Form>
                             )

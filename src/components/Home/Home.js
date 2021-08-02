@@ -4,7 +4,7 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Spinner, Alert } fr
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import {connect} from 'react-redux';
-import {toogleClassModal, toogleJoinClassModal, toogleUnenrollClassModal, createClass, joinClass, unenrollClass, fetchClass} from '../../redux/actionCreators';
+import {toogleClassModal, toogleJoinClassModal, toogleUnenrollClassModal, createClass, joinClass, unenrollClass, fetchClass, fetchUserProfile} from '../../redux/actionCreators';
 import MyTextInput from '../Auth/MyTextInput';
 import ClassCard from '../ClassCard/ClassCard';
 
@@ -42,7 +42,8 @@ const mapDispatchToProps = dispatch => {
         createClass: (clsData, userId) => dispatch(createClass(clsData, userId)),
         joinClass: (clsCode, userId) => dispatch(joinClass(clsCode, userId)),
         unenrollClass: clsCode => dispatch(unenrollClass(clsCode)),
-        fetchClass: userId => dispatch(fetchClass(userId))
+        fetchClass: userId => dispatch(fetchClass(userId)),
+        fetchUserProfile: userId => dispatch(fetchUserProfile(userId))
     }
 }
 
@@ -53,8 +54,10 @@ class Home extends Component {
             
         }
     }
+    
     componentDidMount() {
         this.props.fetchClass(this.props.userId);
+        this.props.fetchUserProfile(this.props.userId);
     }
 
     render() {

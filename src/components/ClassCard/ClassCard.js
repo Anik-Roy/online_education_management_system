@@ -42,7 +42,7 @@ const ClassCard = props => {
         <div className="class-root border rounded">
             <Link to={{pathname: `/class/${classCode}`, state: { classDetails: props.details }}} query={{ the: 'query' }} className="class-upper text-decoration-none">
                 <h5 className="class-title">{props.details.className} {props.details.subject}</h5>
-                <span className="class-teacher">Teacher: {props.details.firstName} {props.details.lastName}</span>
+                <span className="class-teacher">Teacher: {props.details.hasOwnProperty('fullName') && props.details.fullName !== '' ? props.details.fullName : props.details.email}</span>
                 {/* <span>Class code: {classCode}</span> */}
             </Link>
             

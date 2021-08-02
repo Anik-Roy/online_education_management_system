@@ -3,6 +3,7 @@ import * as actionTypes from './actionTypes';
 const INITIAL_STATE = {
     token: null,
     userId: null,
+    userProfile: {},
     authLoading: false,
     authFailedMessage: '',
 
@@ -45,6 +46,8 @@ const INITIAL_STATE = {
     fetchQuizResponsesSuccessMsg: "",
     fetchQuizResponsesErrorMsg: "",
 
+    fetchUserProfileLoading: false,
+    
     unenrollClassLoading: false,
 
     showCommentPostingIndicator: null,
@@ -364,6 +367,18 @@ export const reducer = (state=INITIAL_STATE, action) => {
             return {
                 ...state,
                 fetchQuizResponsesErrorMsg: 'An error occured duing fetching the responses of the quiz! Try again!'
+            }
+        
+        case actionTypes.FETCH_USER_PROFILE_LOADING:
+            return {
+                ...state,
+                fetchUserProfileLoading: action.payload
+            }
+
+        case actionTypes.FETCH_USER_PROFILE:
+            return {
+                ...state,
+                userProfile: action.payload
             }
             
         default:

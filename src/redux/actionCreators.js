@@ -1023,20 +1023,81 @@ export const fetchQuizResponsesError = errorMsg => {
 export const fetchQuizResponses = quiz_id => dispatch => {
     dispatch(fetchQuizResponseLoading(true));
     axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/quiz_responses.json?orderBy="quiz_id"&equalTo="${quiz_id}"`)
-        .then(response => {
-            // console.log(response);
-            let quiz_responses = [];
+        .then(async response => {
+            // let quiz_responses = [];
 
-            Object.keys(response.data).map(key => (
-                quiz_responses.push({...response.data[key], key})
-            ));
-            // console.log(quiz_responses);
-            dispatch(fetchQuizResponseLoading(false));
-            dispatch(fetchQuizResponsesSuccess(quiz_responses));
+            await Promise.all(
+                Object.keys(response.data).map(async key => {
+                    const userId = response.data[key].user_id;
+                    let quiz_response = {};
+
+                    await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`)
+                        .then(res => {
+                            const userProfile = res.data;
+                            quiz_response =  {...response.data[key], userProfile: {...userProfile}, key};
+                        })
+                        .catch(error => {
+                            quiz_response = {...response.data[key], key};
+                        });
+                    console.log(quiz_response);
+                    return quiz_response;
+                })
+            ).then(quiz_responses_list => {
+                // console.log(quiz_responses_list);
+                dispatch(fetchQuizResponseLoading(false));
+                dispatch(fetchQuizResponsesSuccess(quiz_responses_list));
+            });
         })
         .catch(error => {
             console.log(error);
             dispatch(fetchQuizResponseLoading(false));
             dispatch(fetchQuizResponsesError(error));
+        });
+}
+
+export const updateProfileLoading = isLoading => {
+    return {
+        type: actionTypes.UPDATE_PROFILE_LOADING,
+        payload: isLoading
+    }
+}
+
+export const updateProfile = (userId, updated_content) => dispatch => {
+    dispatch(updateProfileLoading(true));
+    console.log(userId, updated_content);
+
+    axios.patch(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`, updated_content)
+        .then(response => {
+            console.log(response);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+}
+
+export const fetchUserProfileLoading = isLoading => {
+    return {
+        type: actionTypes.FETCH_USER_PROFILE,
+        payload: isLoading
+    }
+}
+
+export const fetchUserProfileSuccess = userProfile => {
+    return {
+        type: actionTypes.FETCH_USER_PROFILE,
+        payload: userProfile
+    }
+}
+
+export const fetchUserProfile = userId => dispatch => {
+    dispatch(fetchUserProfileLoading(true));
+
+    axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`)
+        .then(response => {
+            // console.log(response);
+            dispatch(fetchUserProfileSuccess(response.data));
+        })
+        .catch(error => {
+            console.log(error);
         });
 }

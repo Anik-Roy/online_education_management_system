@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import {fetchQuizes} from '../../../../redux/actionCreators';
 import {faFileAlt, faTable, faSort} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Table } from 'reactstrap';
 
 const mapStateToProps = state => {
     return {
@@ -19,25 +20,31 @@ const mapDispatchToProps = dispatch => {
 }
 
 const QuizList = props => {
-    // console.log(props);
+    console.log(props);
     let {classQuizes, fetchQuizes, clsId} = props;
-    console.log(classQuizes);
+    // console.log(classQuizes);
 
     useEffect(() => {
         fetchQuizes(clsId);
-    }, []);
+    }, [fetchQuizes, clsId]);
 
-    let quiz_list = classQuizes.map(quiz => {
+    let quiz_list = classQuizes.map((quiz, idx) => {
         return (
-            <li key={quiz.key} className="quiz-item">
-                <Link to={{pathname: `/class/${clsId}/${quiz.key}`, state: { quizDetails: quiz }}} className="quiz-headline">{quiz.data.title}&nbsp;<sub style={{color: "red"}}>Due date: {quiz.data.dueDate}</sub></Link>
-            </li>
+            <tr key={quiz.key}>
+                <th scope="row">{idx+1}</th>
+                <td><Link to={{pathname: `/class/${clsId}/${quiz.key}`, state: { quizDetails: quiz }}}>{quiz.data.title}</Link></td>
+                <td>{quiz.data.dueDate}</td>
+                <td></td>
+            </tr>
+            // <li key={quiz.key} className="quiz-item">
+            //     <Link to={{pathname: `/class/${clsId}/${quiz.key}`, state: { quizDetails: quiz }}} className="quiz-headline">{quiz.data.title}&nbsp;<sub style={{color: "red"}}>Due date: {quiz.data.dueDate}</sub></Link>
+            // </li>
         );
     });
-
+    
     return (
         <div>
-            {!quiz_list && <div className="class-work-info">
+            {quiz_list.length === 0 && <div className="class-work-info">
                     <p>Assign work to your class here</p>
                     {/* <a href='https://forms.gle/fUoccpHrJC4frYge9'>Go there for exam</a> */}
                     <ul className="class-work-info-list">
@@ -57,9 +64,22 @@ const QuizList = props => {
                 </div>
             }
             {/* <h3 className="quiz-title">Quiz List</h3> */}
-            <ol className="quiz-list">
+            <Table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Quiz Title</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {quiz_list}
+                </tbody>
+            </Table>
+            {/* <ol className="quiz-list">
                 {quiz_list}
-            </ol>
+            </ol> */}
         </div>
     );
 }
