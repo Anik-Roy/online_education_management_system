@@ -13,6 +13,7 @@ const INITIAL_STATE = {
 
     isCreateClassLoading: false,
     isJoinClassLoading: false,
+
     fetchClassLoading: false,
     fetchClassContentsLoading: false,
     fetchSingleClassLoading: false,
@@ -22,9 +23,16 @@ const INITIAL_STATE = {
     fetchClassStudentsLoading: false,
     deleteClassContentLoading: false,
     deleteCommentFromContentLoading: false,
+    
+    createQuizLoading: false,
+    createAssignmentLoading: false,
     fetchQuizesLoading: false,
     quizSubmissionLoading: false,
     fetchQuizResponsesLoading: false,
+
+    fetchAssignmentsLoading: false,
+
+    updateProfileLoading: false,
 
     joinClassFailedMsg: "",
     joinedAlreadyMsg: "",
@@ -40,6 +48,10 @@ const INITIAL_STATE = {
     unenrollClassSuccessMsg: "",
     unenrollClassErrorMsg: "",
 
+    createQuizSuccessMsg: "",
+    createQuizErrorMsg: "",
+    createAssignmentSuccessMsg: "",
+    createAssignmentErrorMsg: "",
     quizSubmissionSuccessMsg: "",
     quizSubmissionErrorMsg: "",
 
@@ -59,6 +71,7 @@ const INITIAL_STATE = {
     classStudents: [],
 
     classQuizes: [],
+    classAssignments: [],
 
     quizResponses: []
 }
@@ -197,7 +210,7 @@ export const reducer = (state=INITIAL_STATE, action) => {
             return {
                 ...state,
                 addClassContentLoading: false,
-                addClassContentSuccessMsg: "Class added successfully!",
+                addClassContentSuccessMsg: "Class content added successfully!",
                 classContents: state.classContents.concat(action.payload)
             }
         
@@ -319,15 +332,69 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 unenrollClassErrorMsg: action.payload,
             }
         
+        case actionTypes.CREATE_QUIZ_LOADING:
+            return {
+                ...state,
+                createQuizLoading: action.payload
+            }
+        case actionTypes.CREATE_QUIZ:
+            return {
+                ...state,
+                createQuizSuccessMsg: 'Your task is uploaded successfully!',
+                createQuizErrorMsg: '',
+                classQuizes: state.classQuizes.concat(action.payload)
+            }
+        
+        case actionTypes.CREATE_QUIZ_ERROR:
+            return {
+                ...state,
+                createQuizErrorMsg: 'An error occured! Please try again.',
+                createQuizSuccessMsg: ''
+            }
+
+        case actionTypes.CREATE_ASSIGNMENT_LOADING:
+            return {
+                ...state,
+                createAssignmentLoading: action.payload
+            }
+
+        case actionTypes.CREATE_ASSIGNMENT:
+            return {
+                ...state,
+                classAssignments: state.classAssignments.concat(action.payload),
+                createAssignmentSuccessMsg: "Your task is uploaded successfully!",
+                createAssignmentErrorMsg: ""
+            }
+
+        case actionTypes.CREATE_ASSIGNMENT_ERROR:
+            return {
+                ...state,
+                createAssignmentErrorMsg: "An error occured! Please try again.",
+                createAssignmentSuccessMsg: ""
+            }
+
         case actionTypes.FETCH_QUIZES_LOADING:
             return {
                 ...state,
                 fetchQuizesLoading: action.payload
             }
+        
         case actionTypes.FETCH_QUIZES:
             return {
                 ...state,
                 classQuizes: action.payload,
+            }
+
+        case actionTypes.FETCH_ASSIGNMENTS_LOADING:
+            return {
+                ...state,
+                fetchAssignmentsLoading: action.payload
+            }
+        
+        case actionTypes.FETCH_ASSIGNMENTS:
+            return {
+                ...state,
+                classAssignments: action.payload,
             }
             
         case actionTypes.SUBMIT_QUIZ_LOADING:
@@ -380,7 +447,19 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 ...state,
                 userProfile: action.payload
             }
-            
+        
+        case actionTypes.UPDATE_PROFILE_LOADING:
+            return {
+                ...state,
+                updateProfileLoading: action.payload
+            }
+
+        case actionTypes.UPDATE_PROFILE:
+            return {
+                ...state,
+                userProfile: action.payload
+            }
+
         default:
             return state;
     }

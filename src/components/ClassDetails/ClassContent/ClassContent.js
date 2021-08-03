@@ -137,7 +137,7 @@ const ClassContent = props => {
                 <div style={{display: 'flex'}}>
                     <img width="50px" height="50px" className="rounded-circle" src="https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/s75-c-fbw=1/photo.jpg" alt="profile-pic" />    
                     <div className="publisher-name ml-2">
-                        <h5>{content.firstName} {content.lastName}</h5>
+                        <h5>{content.hasOwnProperty('fullName') && content.fullName !== '' ? content.fullName : content.email}</h5>
                         <span>{`${posted_at}`}</span>
                     </div>
                 </div>

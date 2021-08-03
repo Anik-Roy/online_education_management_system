@@ -9,6 +9,7 @@ import Logout from './Auth/Logout';
 import Home from './Home/Home';
 import ClassDetails from './ClassDetails/ClassDetails';
 import QuizDetails from './ClassDetails/Classwork/QuizDetails/QuizDetails';
+import AssignmentDetails from './ClassDetails/Classwork/AssignmentDetails/AssignmentDetails';
 import Profile from './Profile/Profile';
 
 const mapStateToProps = state => {
@@ -48,7 +49,8 @@ class Main extends Component {
                     <Route exact path="/" component={Home} />
                     <Route exact path="/class/:classId" component={ClassDetails} />
                     {/* <Route path="/class/:classId" render={props => (<ClassDetails {...props} clsId={props.match.params.classId} />)} /> */}
-                    <Route path="/class/:classId/:quizId" component={QuizDetails} />
+                    <Route path="/class/:classId/:quizId/quiz" component={QuizDetails} />
+                    <Route path="/class/:classId/:quizId/assignment" component={AssignmentDetails} />
                     <Route path="/logout" component={Logout} />
                     <Route path="/profile" component={Profile} />
                     <Redirect to="/" />

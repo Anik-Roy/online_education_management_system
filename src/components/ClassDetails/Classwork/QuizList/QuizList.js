@@ -20,7 +20,7 @@ const mapDispatchToProps = dispatch => {
 }
 
 const QuizList = props => {
-    console.log(props);
+    // console.log(props);
     let {classQuizes, fetchQuizes, clsId} = props;
     // console.log(classQuizes);
 
@@ -32,13 +32,10 @@ const QuizList = props => {
         return (
             <tr key={quiz.key}>
                 <th scope="row">{idx+1}</th>
-                <td><Link to={{pathname: `/class/${clsId}/${quiz.key}`, state: { quizDetails: quiz }}}>{quiz.data.title}</Link></td>
+                <td><Link to={{pathname: `/class/${clsId}/${quiz.key}/quiz`, state: { quizDetails: quiz }}}>{quiz.data.title}</Link></td>
                 <td>{quiz.data.dueDate}</td>
                 <td></td>
             </tr>
-            // <li key={quiz.key} className="quiz-item">
-            //     <Link to={{pathname: `/class/${clsId}/${quiz.key}`, state: { quizDetails: quiz }}} className="quiz-headline">{quiz.data.title}&nbsp;<sub style={{color: "red"}}>Due date: {quiz.data.dueDate}</sub></Link>
-            // </li>
         );
     });
     
@@ -46,7 +43,6 @@ const QuizList = props => {
         <div>
             {quiz_list.length === 0 && <div className="class-work-info">
                     <p>Assign work to your class here</p>
-                    {/* <a href='https://forms.gle/fUoccpHrJC4frYge9'>Go there for exam</a> */}
                     <ul className="class-work-info-list">
                         <li className="class-work-info-list-item">
                             <FontAwesomeIcon icon={faFileAlt} className="mr-3" />
@@ -63,7 +59,7 @@ const QuizList = props => {
                     </ul>
                 </div>
             }
-            {/* <h3 className="quiz-title">Quiz List</h3> */}
+            <h3>Quiz List</h3>
             <Table>
                 <thead>
                     <tr>
@@ -77,9 +73,6 @@ const QuizList = props => {
                     {quiz_list}
                 </tbody>
             </Table>
-            {/* <ol className="quiz-list">
-                {quiz_list}
-            </ol> */}
         </div>
     );
 }

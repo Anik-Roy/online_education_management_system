@@ -125,9 +125,9 @@ const Profile = props => {
                     <Formik
                         initialValues={
                             {   
-                                fullName: '',
-                                studentId: '',
-                                mobileNo: ''
+                                fullName: props.userProfile.fullName,
+                                studentId: props.userProfile.studentId,
+                                mobileNo: props.userProfile.mobileNo
                             }
                         }
                         validate={values => {

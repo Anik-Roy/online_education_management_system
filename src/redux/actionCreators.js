@@ -673,25 +673,6 @@ export const fetchClassContents = classId => dispatch => {
                     dispatch(fetchClassContentsSuccess(data_list));
                 });
 
-                // console.log(data_list);
-                // data_list = Object.keys(response.data).map(async key => {
-                //     console.log(response.data[key].userId);
-                //     let contentCreatorId = response.data[key].userId;
-                //     let contentCreator = {};
-
-                //     await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${contentCreatorId}.json`)
-                //         .then(creator => {
-                //             console.log(creator.data);
-                //             contentCreator = creator.data;
-                //             return {key, value: {...response.data[key], ...creator.data}}
-                //         })
-                //         .catch(error => {
-                //             console.log(error);
-                //         })
-                //     return {key, value: {...response.data[key], ...contentCreator}}
-                // });   
-                // console.log(data_list);
-                // dispatch(fetchClassContentsSuccess(data_list));
             }
         })
         .catch(error => {
@@ -917,16 +898,52 @@ export const createQuizLoading = isLoading => {
     }
 }
 
-export const createQuiz = quiz_data => dispatch => {
+export const createQuiz = (quiz_data) => dispatch => {
     console.log(quiz_data);
     dispatch(createQuizLoading(true));
 
-    axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/quizes.json`, quiz_data)
+    axios.post('https://sust-online-learning-default-rtdb.firebaseio.com/quizes.json', quiz_data)
         .then(response => {
             console.log(response.data);
+            dispatch(createQuizLoading(false));
         })
         .catch(error => {
             console.log(error);
+        });
+}
+
+export const createAssignmentLoading = isLoading => {
+    return {
+        type: actionTypes.CREATE_ASSIGNMENT_LOADING,
+        payload: isLoading
+    }
+}
+
+export const createAssignmentSuccess = data => {
+    return {
+        type: actionTypes.CREATE_ASSIGNMENT,
+        payload: data
+    }
+}
+
+export const createAssignmentError = error => {
+    return {
+        type: actionTypes.CREATE_ASSIGNMENT_ERROR,
+        payload: error
+    }
+}
+
+export const createAssignment = assignment_data => dispatch => {
+    dispatch(createAssignmentLoading(true));
+    axios.post('https://sust-online-learning-default-rtdb.firebaseio.com/assignments.json', assignment_data)
+        .then(response => {
+            console.log(response.data);
+            dispatch(createAssignmentLoading(false));
+            dispatch(createAssignmentSuccess(response.data));
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(createAssignmentError(error));
         });
 }
 
@@ -958,6 +975,40 @@ export const fetchQuizes = clsId => dispatch => {
             });
             // console.log(classQuizes);
             dispatch(fetchQuizesSuccess(classQuizes));
+        })
+        .catch(error => {
+            console.log(error);
+        });
+}
+
+export const fetchAssignmentsLoading = isLoading => {
+    return {
+        type: actionTypes.FETCH_ASSIGNMENTS_LOADING,
+        payload: isLoading
+    }
+}
+
+export const fetchAssignmentSuccess = data => {
+    return {
+        type: actionTypes.FETCH_ASSIGNMENTS,
+        payload: data
+    }
+}
+
+export const fetchAssignments = clsId => dispatch => {
+    dispatch(fetchAssignmentsLoading(true));
+
+    axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/assignments.json?orderBy="class_id"&equalTo="${clsId}"`)
+        .then(response => {
+            // console.log(response.data);
+            let classAssignments = [];
+            Object.keys(response.data).map(key => {
+                classAssignments.push({key: key, data: response.data[key]});
+                // return console.log(key, response.data[key]);
+                return true;
+            });
+            dispatch(fetchAssignmentsLoading(false));
+            dispatch(fetchAssignmentSuccess(classAssignments));
         })
         .catch(error => {
             console.log(error);
@@ -1062,13 +1113,24 @@ export const updateProfileLoading = isLoading => {
     }
 }
 
+export const updateProfileSuccess = data => {
+    return {
+        type: actionTypes.UPDATE_PROFILE,
+        payload: data
+    }
+}
+
 export const updateProfile = (userId, updated_content) => dispatch => {
     dispatch(updateProfileLoading(true));
-    console.log(userId, updated_content);
+    // console.log(userId, updated_content);
 
     axios.patch(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`, updated_content)
         .then(response => {
             console.log(response);
+            dispatch(updateProfileLoading(false));
+            // dispatch(updateProfileSuccess(response.data));
+            dispatch(fetchUserProfile(userId));
+
         })
         .catch(error => {
             console.log(error);

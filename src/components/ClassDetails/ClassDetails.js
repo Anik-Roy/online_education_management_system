@@ -309,7 +309,7 @@ class ClassDetails extends Component {
             return new Date(b.value.posted_at) - new Date(a.value.posted_at)
         });
         
-        console.log(this.props.classContents);
+        // console.log(this.props.classContents);
 
         classContents = classContents.map(clsContent => (
             <ClassContent key={clsContent.key} content={{...clsContent.value, contentId: clsContent.key}} />
@@ -369,7 +369,7 @@ class ClassDetails extends Component {
         let classwork = (<Classwork clsId={classId} />);
 
         // console.log(classDetails);
-        let people = (<People classId={this.props.match.params.classId} classTeacher={classDetails?.firstName + ' ' + classDetails?.lastName} classTeacherId={classDetails?.user} />);
+        let people = (<People classId={this.props.match.params.classId} classTeacher={classDetails?.hasOwnProperty('fullName') ? classDetails.fullName : classDetails?.email} classTeacherId={classDetails?.user} />);
 
         return (
             <div className="root">
