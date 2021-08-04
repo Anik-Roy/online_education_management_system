@@ -1,27 +1,33 @@
 import React, { useState } from 'react';
 import './Profile.css';
 import { Formik } from 'formik';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Alert } from 'reactstrap';
 import { connect } from 'react-redux';
-import { updateProfile } from '../../redux/actionCreators';
+import { updateProfile, updateProfileModalOpen } from '../../redux/actionCreators';
 
 const mapStateToProps = state => {
     return {
         userId: state.userId,
-        userProfile: state.userProfile
+        userProfile: state.userProfile,
+        isUpdateProfileModalOpen: state.isUpdateProfileModalOpen,
+        updateProfileSuccessMsg: state.updateProfileSuccessMsg
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        updateProfile: (userId, updated_content) => dispatch(updateProfile(userId, updated_content))
+        updateProfile: (userId, updated_content) => dispatch(updateProfile(userId, updated_content)),
+        updateProfileModalOpen: isOpen => dispatch(updateProfileModalOpen(isOpen))
     }
 }
 
 const Profile = props => {
-    const [modal, setModal] = useState(false);
+    // const [modal, setModal] = useState(false);
+    const [visible, setVisible] = useState(true);
 
-    const toggle = () => setModal(!modal);
+    const onDismiss = () => setVisible(false);
+
+    const toggle = () => props.updateProfileModalOpen(!props.isUpdateProfileModalOpen)
     
     const handleSubmit = updated_content => {
         props.updateProfile(props.userId, updated_content)
@@ -30,6 +36,7 @@ const Profile = props => {
     return (
         <div className="container">
             <div className="main-body">
+                {props.updateProfileSuccessMsg && <Alert color="success" isOpen={visible} toggle={onDismiss}>{props.updateProfileSuccessMsg}</Alert>}
                 <div className="row gutters-sm">
                     <div className="col-md-4 mb-3">
                         <div className="card">
@@ -119,7 +126,7 @@ const Profile = props => {
                     </div>
                 </div>
             </div>
-            <Modal isOpen={modal} toggle={toggle}>
+            <Modal isOpen={props.isUpdateProfileModalOpen} toggle={toggle}>
                 <ModalHeader toggle={toggle}>Edit profile</ModalHeader>
                 <ModalBody>
                     <Formik
@@ -151,6 +158,7 @@ const Profile = props => {
                             return errors;
                         }}
                         onSubmit={(values, { setSubmitting }) => {
+                            console.log(values);
                             handleSubmit(JSON.stringify(values));
                             setSubmitting(false);
                         }}

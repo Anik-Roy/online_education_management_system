@@ -48,42 +48,119 @@ export const auth = (userData, mode) => dispatch => {
     const API_KEY = 'AIzaSyA1Zis2HMVkvDlk7n5Zbx8P-0xYCojbKUA';
 
     axios.post(authUrl+API_KEY, authData)
-    .then(async response => {
-        // console.log(response);
-        dispatch(authLoading(false));
-        localStorage.setItem('token', response.data.idToken);
-        localStorage.setItem('userId', response.data.localId);
-        const expirationTime = new Date(new Date().getTime() + response.data.expiresIn * 1000);
-        localStorage.setItem('expirationTime', expirationTime);
+        .then(async response => {
+            // console.log(response);
+            dispatch(authLoading(false));
+            
+            let userId = response.data.localId;
 
-        let userId = response.data.localId;
+            if(mode === "signup") {
+                await axios.put(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`, {
+                    fullName: userData.fullName,
+                    email: userData.email
+                }).then(response => {
+                    console.log(response);
+                }).catch(error => {
+                    console.log(error);
+                });
+                sendVarificationEmail(response.data.idToken)
+                    .then(verificationEmailSent => {
+                        if(verificationEmailSent === 'success') {
+                            dispatch({type: actionTypes.SEND_EMAIL_VARIFICATION_MSG, payload: `We've sent a varification email to the email ${response.data.email}. Please check and verify your account!`})
+                            document.body.scrollTop = 0; // For Safari
+                            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+                        } else if(verificationEmailSent === 'error') {
+                            dispatch({type: actionTypes.SEND_EMAIL_VARIFICATION_ERROR_MSG, payload: "An error occured! Please confirm that you've provided correct email address"})
+                            document.body.scrollTop = 0; // For Safari
+                            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            } else {
+                // let emailVarified = checkIfEmailIsVarified(response.data.idToken);
+                checkIfEmailIsVarified(response.data.idToken)
+                    .then(emailVarified => {
+                        console.log(emailVarified);
 
-        if(mode === "signup") {
-            await axios.put(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`, {
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                email: userData.email
-            }).then(response => {
-                console.log(response);
-            }).catch(error => {
-                console.log(error);
-            });
-        }
+                        if(emailVarified === 'varified') {
+                            localStorage.setItem('token', response.data.idToken);
+                            localStorage.setItem('userId', response.data.localId);
+                            const expirationTime = new Date(new Date().getTime() + response.data.expiresIn * 1000);
+                            localStorage.setItem('expirationTime', expirationTime);
+                            dispatch(authSuccess(response.data.idToken, response.data.localId));
+                        } else if(emailVarified === 'not varified') {
+                            console.log('not varified');
+                            document.body.scrollTop = 0; // For Safari
+                            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+                            return dispatch({type: actionTypes.EMAIL_VARIFICATION_MSG, payload: "Your email is not varified! Please varify your email by clicking on the link that we send to your email."});
+                        } else if(emailVarified === 'An error occured! Please try again.') {
+                            document.body.scrollTop = 0; // For Safari
+                            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+                            return dispatch({type: actionTypes.EMAIL_VARIFICATION_ERROR_MSG, payload: emailVarified});
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            }
+        })
+        .catch(error => {
+            dispatch(authLoading(false));
+            console.log(error.message);
+            let msg = '';
+            if(error.message.includes('400')) {
+                msg = 'No account found with the given credentials!';
+            } else {
+                msg = error;
+            }
 
-        dispatch(authSuccess(response.data.idToken, response.data.localId));
-    })
-    .catch(error => {
-        dispatch(authLoading(false));
-        console.log(error.message);
-        let msg = '';
-        if(error.message.includes('400')) {
-            msg = 'No account found with the given credentials!';
-        } else {
-            msg = error;
-        }
+            dispatch(authFailed(msg));
+        });
+}
 
-        dispatch(authFailed(msg));
-    });
+const sendVarificationEmail = async idToken => {
+    const requestPayload = {
+        requestType: "VERIFY_EMAIL",
+        idToken: idToken
+    };
+    const API_KEY = 'AIzaSyA1Zis2HMVkvDlk7n5Zbx8P-0xYCojbKUA';
+    return axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${API_KEY}`, requestPayload)
+        .then(response => {
+            console.log(response);
+            return 'success';            
+        })
+        .catch(error => {
+            console.log(error);
+            return 'error';
+        });
+}
+
+const checkIfEmailIsVarified = async idToken => {
+    const requestPayload = {
+        idToken: idToken
+    };
+    const API_KEY = 'AIzaSyA1Zis2HMVkvDlk7n5Zbx8P-0xYCojbKUA';
+    let emailVarified = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${API_KEY}`, requestPayload)
+        .then(response => {
+            // console.log(response);
+            const user_data = response.data.users[0];
+            console.log(user_data);
+            if(!user_data.emailVerified) {
+                console.log('returning not varified!');
+                return 'not varified';
+            } else {
+                console.log('returning varified!');
+                return 'varified';
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            console.log('returning error!');
+            return 'An error occured! Please try again.';
+        });
+    return emailVarified;
 }
 
 export const logout = () => {
@@ -939,7 +1016,7 @@ export const createAssignment = assignment_data => dispatch => {
         .then(response => {
             console.log(response.data);
             dispatch(createAssignmentLoading(false));
-            dispatch(createAssignmentSuccess(response.data));
+            dispatch(createAssignmentSuccess({key: response.data, data: assignment_data}));
         })
         .catch(error => {
             console.log(error);
@@ -1050,6 +1127,41 @@ export const submitQuiz = user_response => dispatch => {
         });
 }
 
+export const submitAssignmentLoading = isLoading => {
+    return {
+        type: actionTypes.SUBMIT_ASSIGNMENT_LOADING,
+        payload: isLoading
+    }
+}
+
+export const submitAssignmentError = errMsg => {
+    return {
+        type: actionTypes.SUBMIT_ASSIGNMENT_ERROR,
+        payload: errMsg
+    }
+}
+
+export const submitAssignmentSuccess = () => {
+    return {
+        type: actionTypes.SUBMIT_ASSIGNMENT
+    }
+}
+
+export const submitAssignment = user_response => dispatch => {
+    dispatch(submitAssignmentLoading(true));
+
+    axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/assignment_responses.json`, user_response)
+        .then(response => {
+            console.log(response);
+            dispatch(submitAssignmentLoading(false));
+            dispatch(submitAssignmentSuccess());
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(submitAssignmentError(error))
+        });
+}
+
 export const fetchQuizResponseLoading = isLoading => {
     return {
         type: actionTypes.FETCH_QUIZ_RESPONSES_LOADING,
@@ -1106,6 +1218,86 @@ export const fetchQuizResponses = quiz_id => dispatch => {
         });
 }
 
+export const fetchAssignmentResponseLoading = isLoading => {
+    return {
+        type: actionTypes.FETCH_ASSIGNMENT_RESPONSES_LOADING,
+        payload: isLoading
+    }
+}
+
+export const fetchAssignmentResponsesSuccess = data => {
+    return {
+        type: actionTypes.FETCH_ASSIGNMENT_RESPONSES,
+        payload: data
+    }
+}
+
+export const fetchAssignmentResponsesError = errorMsg => {
+    return {
+        type: actionTypes.FETCH_ASSIGNMENT_RESPONSES_ERROR,
+        payload: errorMsg
+    }
+}
+
+export const fetchAssignmentResponses = assignment_id => dispatch => {
+    dispatch(fetchAssignmentResponseLoading(true));
+    axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/assignment_responses.json?orderBy="assignment_id"&equalTo="${assignment_id}"`)
+        .then(async response => {
+            // let quiz_responses = [];
+
+            await Promise.all(
+                Object.keys(response.data).map(async key => {
+                    const userId = response.data[key].user_id;
+                    let assignment_response = {};
+
+                    await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`)
+                        .then(res => {
+                            const userProfile = res.data;
+                            assignment_response =  {...response.data[key], userProfile: {...userProfile}, key};
+                        })
+                        .catch(error => {
+                            assignment_response = {...response.data[key], key};
+                        });
+                    console.log(assignment_response);
+                    return assignment_response;
+                })
+            ).then(assignment_responses_list => {
+                // console.log(quiz_responses_list);
+                dispatch(fetchAssignmentResponseLoading(false));
+                dispatch(fetchAssignmentResponsesSuccess(assignment_responses_list));
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(fetchAssignmentResponseLoading(false));
+            dispatch(fetchAssignmentResponsesError(error));
+        });
+}
+
+export const updateAssignmentMarksLoading = isLoading => {
+    return {
+        type: actionTypes.UPDATE_ASSIGNMENT_MARK_LOADING,
+        payload: isLoading
+    }
+}
+
+export const updateAssignmentMarks = (assignmentResponseId, marks) => dispatch => {
+    console.log(assignmentResponseId, marks);
+    dispatch(updateAssignmentMarksLoading(true));
+
+    axios.patch(`https://sust-online-learning-default-rtdb.firebaseio.com/assignment_responses/${assignmentResponseId}.json`, {marks: marks})
+        .then(response => {
+            console.log(response);
+            dispatch(updateAssignmentMarksLoading(false));
+            return dispatch({type: actionTypes.UPDATE_ASSIGNMENT_MARK, payload: response.data})
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(updateAssignmentMarksLoading(false));
+            return dispatch({type: actionTypes.UPDATE_ASSIGNMENT_MARK_ERROR, payload: "An error occured! Try again."})
+        });
+}
+
 export const updateProfileLoading = isLoading => {
     return {
         type: actionTypes.UPDATE_PROFILE_LOADING,
@@ -1116,7 +1308,7 @@ export const updateProfileLoading = isLoading => {
 export const updateProfileSuccess = data => {
     return {
         type: actionTypes.UPDATE_PROFILE,
-        payload: data
+        payload: "Profile updated successfully!"
     }
 }
 
@@ -1128,13 +1320,23 @@ export const updateProfile = (userId, updated_content) => dispatch => {
         .then(response => {
             console.log(response);
             dispatch(updateProfileLoading(false));
-            // dispatch(updateProfileSuccess(response.data));
+            dispatch(updateProfileSuccess(response.data));
+            dispatch(updateProfileModalOpen(false));
             dispatch(fetchUserProfile(userId));
-
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
         })
         .catch(error => {
             console.log(error);
         })
+}
+
+export const updateProfileModalOpen = isOpen => {
+    console.log(isOpen);
+    return {
+        type: actionTypes.UPDATE_PROFILE_MODAL_OPEN,
+        payload: isOpen
+    }
 }
 
 export const fetchUserProfileLoading = isLoading => {

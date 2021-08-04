@@ -6,6 +6,10 @@ const INITIAL_STATE = {
     userProfile: {},
     authLoading: false,
     authFailedMessage: '',
+    emailVarificationMsg: '',
+    emailVarificationErrorMsg: '',
+    sendEmailVarificationSuccessMsg: '',
+    sendEmailVarificationErrorMsg: '',
 
     isCreteClassModalOpen: false,
     isJoinClassModalOpen: false,
@@ -29,10 +33,13 @@ const INITIAL_STATE = {
     fetchQuizesLoading: false,
     quizSubmissionLoading: false,
     fetchQuizResponsesLoading: false,
-
     fetchAssignmentsLoading: false,
+    assignmentSubmissionLoading: false,
+    fetchAssignmentResponsesLoading: false,
 
+    isUpdateProfileModalOpen: false,
     updateProfileLoading: false,
+    updateProfileSuccessMsg: '',
 
     joinClassFailedMsg: "",
     joinedAlreadyMsg: "",
@@ -54,9 +61,18 @@ const INITIAL_STATE = {
     createAssignmentErrorMsg: "",
     quizSubmissionSuccessMsg: "",
     quizSubmissionErrorMsg: "",
+    assignmentSubmissionSuccessMsg: '',
+    assignmentSubmissionErrorMsg: '',
+
+    updateAssignmentMarkLoading: false,
+    updateAssignmentMarkSuccessMsg: "",
+    updateAssignmentMarkErrorMsg: "",
 
     fetchQuizResponsesSuccessMsg: "",
     fetchQuizResponsesErrorMsg: "",
+
+    fetchAssignmentResponsesSuccessMsg: "",
+    fetchAssignmentResponsesErrorMsg: "",
 
     fetchUserProfileLoading: false,
     
@@ -73,7 +89,8 @@ const INITIAL_STATE = {
     classQuizes: [],
     classAssignments: [],
 
-    quizResponses: []
+    quizResponses: [],
+    assignmentResponses: []
 }
 
 export const reducer = (state=INITIAL_STATE, action) => {
@@ -92,7 +109,83 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 ...state,
                 token: null,
                 userId: null,
+                userProfile: {},
+                authLoading: false,
                 authFailedMessage: '',
+                emailVarificationMsg: '',
+                emailVarificationErrorMsg: '',
+                sendEmailVarificationSuccessMsg: '',
+                sendEmailVarificationErrorMsg: '',
+
+                isCreteClassModalOpen: false,
+                isJoinClassModalOpen: false,
+                isUnenrollClassModalOpen: false,
+
+                isCreateClassLoading: false,
+                isJoinClassLoading: false,
+
+                fetchClassLoading: false,
+                fetchClassContentsLoading: false,
+                fetchSingleClassLoading: false,
+                addClassContentLoading: false,
+                addClassCommentLoading: false,
+                fetchClassCommentsLoading: false,
+                fetchClassStudentsLoading: false,
+                deleteClassContentLoading: false,
+                deleteCommentFromContentLoading: false,
+                
+                createQuizLoading: false,
+                createAssignmentLoading: false,
+                fetchQuizesLoading: false,
+                quizSubmissionLoading: false,
+                fetchQuizResponsesLoading: false,
+
+                fetchAssignmentsLoading: false,
+
+                isUpdateProfileModalOpen: false,
+                updateProfileLoading: false,
+                updateProfileSuccessMsg: '',
+
+                joinClassFailedMsg: "",
+                joinedAlreadyMsg: "",
+                fetchClassErrorMsg: "",
+                fetchSingleClassErrorMsg: "",
+                addClassContentSuccessMsg: "",
+                addClassContentErrorMsg: "",
+                fetchClassStudentsErrorMsg: "",
+                deleteClassContentSuccessMsg: "",
+                deleteClassContentErrorMsg: "",
+
+                selectedClassToUnenroll: null,
+                unenrollClassSuccessMsg: "",
+                unenrollClassErrorMsg: "",
+
+                createQuizSuccessMsg: "",
+                createQuizErrorMsg: "",
+                createAssignmentSuccessMsg: "",
+                createAssignmentErrorMsg: "",
+                quizSubmissionSuccessMsg: "",
+                quizSubmissionErrorMsg: "",
+
+                fetchQuizResponsesSuccessMsg: "",
+                fetchQuizResponsesErrorMsg: "",
+
+                fetchUserProfileLoading: false,
+                
+                unenrollClassLoading: false,
+
+                showCommentPostingIndicator: null,
+
+                classDetails: null,
+                classes: [],
+                classContents: [],
+                classComments: [],
+                classStudents: [],
+
+                classQuizes: [],
+                classAssignments: [],
+
+                quizResponses: []
             }
         
         case actionTypes.AUTH_LOADING:
@@ -105,6 +198,32 @@ export const reducer = (state=INITIAL_STATE, action) => {
             return {
                 ...state,
                 authFailedMessage: action.payload,
+            }
+
+        case actionTypes.EMAIL_VARIFICATION_MSG:
+            return {
+                ...state,
+                emailVarificationMsg: action.payload,
+                emailVarificationErrorMsg: ''
+            }
+
+        case actionTypes.EMAIL_VARIFICATION_ERROR_MSG:
+            return {
+                ...state,
+                emailVarificationErrorMsg: action.payload,
+                emailVarificationMsg: ''
+            }
+        
+        case actionTypes.SEND_EMAIL_VARIFICATION_MSG:
+            return {
+                ...state,
+                sendEmailVarificationSuccessMsg: action.payload
+            }
+
+        case actionTypes.SEND_EMAIL_VARIFICATION_ERROR_MSG:
+            return {
+                ...state,
+                sendEmailVarificationErrorMsg: action.payload
             }
 
         case actionTypes.TOOGLE_CREATE_CLASS_MODAL:
@@ -418,6 +537,27 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 quizSubmissionSuccessMsg: ''
             }
 
+        case actionTypes.SUBMIT_ASSIGNMENT_LOADING:
+            return {
+                ...state,
+                assignmentSubmissionLoading: action.payload,
+                assignmentSubmissionSuccessMsg: '',
+                assignmentSubmissionErrorMsg: ''
+            }
+        
+        case actionTypes.SUBMIT_ASSIGNMENT:
+            return {
+                ...state,
+                assignmentSubmissionSuccessMsg: "Your response has been recorded!",
+                assignmentSubmissionErrorMsg: ''
+            }
+        case actionTypes.SUBMIT_ASSIGNMENT_ERROR:
+            return {
+                ...state,
+                assignmentSubmissionErrorMsg: "Sorry! Your response cannot be recorded at that time! Try again!",
+                assignmentSubmissionSuccessMsg: ''
+            }
+
         case actionTypes.FETCH_QUIZ_RESPONSES_LOADING:
             return {
                 ...state,
@@ -435,7 +575,45 @@ export const reducer = (state=INITIAL_STATE, action) => {
                 ...state,
                 fetchQuizResponsesErrorMsg: 'An error occured duing fetching the responses of the quiz! Try again!'
             }
+
+        case actionTypes.FETCH_ASSIGNMENT_RESPONSES_LOADING:
+            return {
+                ...state,
+                fetchAssignmentResponsesLoading: action.payload
+            }
         
+        case actionTypes.FETCH_ASSIGNMENT_RESPONSES:
+            return {
+                ...state,
+                assignmentResponses: action.payload
+            }
+        
+        case actionTypes.FETCH_ASSIGNMENT_RESPONSES_ERROR:
+            return {
+                ...state,
+                fetchAssignmentResponsesErrorMsg: 'An error occured duing fetching the responses of the quiz! Try again!'
+            }
+        
+        case actionTypes.UPDATE_ASSIGNMENT_MARK_LOADING:
+            return {
+                ...state,
+                updateAssignmentMarkLoading: action.payload
+            }
+
+        case actionTypes.UPDATE_ASSIGNMENT_MARK:
+            return {
+                ...state,
+                updateAssignmentMarkSuccessMsg: "Marks updated!",
+                updateAssignmentMarkErrorMsg: ""
+            }
+        
+        case actionTypes.UPDATE_ASSIGNMENT_MARK_ERROR:
+            return {
+                ...state,
+                updateAssignmentMarkErrorMsg: "An error occured! Try again.",
+                updateAssignmentMarkSuccessMsg: ""
+            }
+            
         case actionTypes.FETCH_USER_PROFILE_LOADING:
             return {
                 ...state,
@@ -457,7 +635,13 @@ export const reducer = (state=INITIAL_STATE, action) => {
         case actionTypes.UPDATE_PROFILE:
             return {
                 ...state,
-                userProfile: action.payload
+                updateProfileSuccessMsg: action.payload
+            }
+
+        case actionTypes.UPDATE_PROFILE_MODAL_OPEN:
+            return {
+                ...state,
+                isUpdateProfileModalOpen: action.payload
             }
 
         default:

@@ -64,11 +64,11 @@ class AssignmentDetails extends Component {
     }
 
     render() {
-        console.log(this.props);
-        const {assignmentId} = this.props.match.params;
+        const {classId, assignmentId} = this.props.match.params;
+        // console.log(classId, assignmentId);
         const {assignmentDetails} = this.props.location.state;
 
-        let assignment_content = <AssignmentContent assignmentId={assignmentId} assignmentDetails={assignmentDetails} />
+        let assignment_content = <AssignmentContent assignmentDetails={assignmentDetails} />
         let assignment_responses = <AssignmentResponses assignmentId={assignmentId} assignmentDetails={assignmentDetails} />
         let assignment_chart = <AssignmentChart />
 

@@ -26,6 +26,7 @@ const AssignmentList = props => {
     }, [fetchAssignments, clsId]);
 
     let assignment_list = classAssignments.map((assignment, idx) => {
+        console.log(assignment);
         return (
             <tr key={assignment.key}>
                 <th scope="row">{idx+1}</th>

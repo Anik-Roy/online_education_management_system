@@ -5,7 +5,7 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import MyTextInput from './MyTextInput';
 import {auth} from '../../redux/actionCreators';
-import {Alert} from 'reactstrap';
+import {Alert, Spinner} from 'reactstrap';
 
 const mapStateToProps = state => {
     return {
@@ -13,6 +13,8 @@ const mapStateToProps = state => {
         userId: state.userId,
         authLoading: state.authLoading,
         authFailedMessage: state.authFailedMessage,
+        emailVarificationMsg: state.emailVarificationMsg,
+        emailVarificationErrorMsg: state.emailVarificationErrorMsg
     }
 }
 
@@ -28,6 +30,8 @@ class Login extends Component {
         return (
             <div style={{margin: "0 auto", padding: "20px", width: "700px"}}>
                 <h3 className="text-center text-success my-5">Login to join/create classes</h3>
+                {this.props.emailVarificationMsg && <Alert color="warning">{this.props.emailVarificationMsg}</Alert>}
+                {this.props.emailVarificationErrorMsg && <Alert color="warning">{this.props.emailVarificationErrorMsg}</Alert>}
                 {this.props.authFailedMessage !== '' && <Alert color="warning">{this.props.authFailedMessage}</Alert>}
                 <Formik
                     initialValues={{
@@ -64,6 +68,7 @@ class Login extends Component {
                         />
                 
                         <button type="submit" className="btn btn-sm btn-primary mr-3">Submit</button>
+                        {this.props.authLoading && <Spinner color="success" />}
                         <span>Don't have an account?
                             Signup <Link to="/signup">here!</Link>
                         </span>

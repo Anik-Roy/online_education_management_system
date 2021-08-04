@@ -81,6 +81,7 @@ class Home extends Component {
                 {this.props.joinClassFailedMsg !== "" && <Alert color="info">{this.props.joinClassFailedMsg}</Alert>}
                 
                 <div className="all-class">
+                    {classCards.length === 0 && <Alert className="mx-auto" color="info">You've not joined/created any class yet!</Alert>}
                     {classCards}
                 </div>
                 {/* Create class modal */}

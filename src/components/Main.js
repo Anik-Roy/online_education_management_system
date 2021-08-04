@@ -50,7 +50,7 @@ class Main extends Component {
                     <Route exact path="/class/:classId" component={ClassDetails} />
                     {/* <Route path="/class/:classId" render={props => (<ClassDetails {...props} clsId={props.match.params.classId} />)} /> */}
                     <Route path="/class/:classId/:quizId/quiz" component={QuizDetails} />
-                    <Route path="/class/:classId/:quizId/assignment" component={AssignmentDetails} />
+                    <Route path="/class/:classId/:assignmentId/assignment" component={AssignmentDetails} />
                     <Route path="/logout" component={Logout} />
                     <Route path="/profile" component={Profile} />
                     <Redirect to="/" />

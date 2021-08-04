@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import MyTextInput from './MyTextInput';
 import { connect } from 'react-redux';
 import { auth } from '../../redux/actionCreators';
+import { Toast, ToastBody, ToastHeader } from 'reactstrap';
 
 const mapStateToProps = state => {
     return {
@@ -12,6 +13,8 @@ const mapStateToProps = state => {
         userId: state.userId,
         authLoading: state.authLoading,
         authFailedMessage: state.authFailedMessage,
+        sendEmailVarificationSuccessMsg: state.sendEmailVarificationSuccessMsg,
+        sendEmailVarificationErrorMsg: state.sendEmailVarificationErrorMsg
     }
 }
 
@@ -26,20 +29,27 @@ class Signup extends Component {
         return (
             <div style={{margin: "0 auto", padding: "20px", width: "700px"}}>
                 <h3 className="text-center text-success my-5">Signup to join/create classes</h3>
+                {(this.props.sendEmailVarificationSuccessMsg || this.props.sendEmailVarificationErrorMsg) && <div className="p-3 bg-primary my-2 rounded">
+                    <Toast>
+                        <ToastHeader>
+                            Email varification
+                        </ToastHeader>
+                        <ToastBody>
+                            {this.props.sendEmailVarificationSuccessMsg}
+                            {this.props.sendEmailVarificationErrorMsg}
+                        </ToastBody>
+                    </Toast>
+                </div>}
                 <Formik
                     initialValues={{
-                        firstName: '',
-                        lastName: '',
+                        fullName: '',
                         email: '',
                         password: '',
                         passwordConfirmation: '',
                     }}
                     validationSchema={Yup.object({
-                    firstName: Yup.string()
-                        .max(15, 'Must be 15 characters or less')
-                        .required('Required'),
-                    lastName: Yup.string()
-                        .max(20, 'Must be 20 characters or less')
+                    fullName: Yup.string()
+                        .max(15, 'Must be less than or equal 20 characters!')
                         .required('Required'),
                     email: Yup.string()
                         .email('Invalid email address')
@@ -58,18 +68,11 @@ class Signup extends Component {
                 >
                     <Form>
                         <MyTextInput
-                            label="First Name"
-                            id="firstName"
-                            name="firstName"
+                            label="Full Name"
+                            id="fullName"
+                            name="fullName"
                             type="text"
-                            placeholder="Jane"
-                        />
-                
-                        <MyTextInput
-                            label="Last Name"
-                            name="lastName"
-                            type="text"
-                            placeholder="Doe"
+                            placeholder="Jane Doe"
                         />
                 
                         <MyTextInput

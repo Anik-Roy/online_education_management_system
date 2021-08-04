@@ -110,11 +110,10 @@ class CreateClassWork extends Component {
     }
 
     onQuizSubmitClick = async clsId => {
-        // console.log(this.state.title, this.state.quizQuestions, this.state.dueDate, clsId);
         if(this.state.examType === 'Assignment') {
             await new Promise((resolve, reject) => {
                 let storageRef = storage.ref();
-                let folderRef = storageRef.child('clsId/assignment');
+                let folderRef = storageRef.child(`${clsId}/assignment`);
     
                 let file = this.state.assignmentFile;
                 let {name, type} = file;
@@ -127,17 +126,6 @@ class CreateClassWork extends Component {
                         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         console.log(progress);
-                        // console.log('Upload is ' + progress + '% done');
-                        
-                        // let tempSelectedFiles = this.state.selectedFiles;
-                        // let tempFileObj = this.state.selectedFiles[idx];
-                        // tempFileObj.progress = progress;
-                        // tempSelectedFiles[idx] = tempFileObj;
-    
-                        // this.setState({
-                        //     ...this.state,
-                        //     selectedFiles: tempSelectedFiles
-                        // });
     
                         switch (snapshot.state) {
                             case firebase.storage.TaskState.PAUSED: // or 'paused'
@@ -177,16 +165,6 @@ class CreateClassWork extends Component {
                     }
                 );
             });
-
-            const assignment_data = {
-                title: this.state.title,
-                instruction: this.state.instruction,
-                assignmentFile: this.state.assignmentFile,
-                dueDate: this.state.dueDate,
-                author_id: this.props.userId,
-                class_id: clsId
-            }
-            this.props.createAssignment(assignment_data);
         } else if(this.state.examType === 'Quiz') {
             const quiz_data = {
                 title: this.state.title,
