@@ -597,7 +597,9 @@ export const reducer = (state=INITIAL_STATE, action) => {
         case actionTypes.UPDATE_ASSIGNMENT_MARK_LOADING:
             return {
                 ...state,
-                updateAssignmentMarkLoading: action.payload
+                updateAssignmentMarkLoading: action.payload,
+                updateAssignmentMarkSuccessMsg: "",
+                updateAssignmentMarkErrorMsg: ""
             }
 
         case actionTypes.UPDATE_ASSIGNMENT_MARK:

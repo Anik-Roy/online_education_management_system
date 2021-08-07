@@ -73,25 +73,27 @@ class QuizDetails extends Component {
 
         return (
             <div className="quiz-details-root">
-                <Navbar color="faded" light expand="md">
-                    <NavbarToggler onClick={this.toggleNav} />
-                    <Collapse isOpen={this.state.isNavOpen} navbar>
-                        <Nav className="mx-auto" navbar>
-                            <NavItem onClick={this.alterSelectedNavitem} className={this.state.showQuiz ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
-                                Quiz
-                            </NavItem>
-                            <NavItem onClick={this.alterSelectedNavitem} className={this.state.showResponse ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
-                                Responses
-                            </NavItem>
-                            <NavItem onClick={this.alterSelectedNavitem} className={this.state.showChart ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
-                                Chart
-                            </NavItem>
-                        </Nav>
-                    </Collapse>
-                </Navbar>
-                {this.state.showQuiz && quiz_content}
-                {this.state.showResponse && quiz_responses}
-                {this.state.showChart && quiz_chart}
+                <div className="quiz-details">
+                    <Navbar color="faded" light expand="md">
+                        <NavbarToggler onClick={this.toggleNav} />
+                        <Collapse isOpen={this.state.isNavOpen} navbar>
+                            <Nav className="mx-auto" navbar>
+                                <NavItem onClick={this.alterSelectedNavitem} className={this.state.showQuiz ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                                    Quiz
+                                </NavItem>
+                                <NavItem onClick={this.alterSelectedNavitem} className={this.state.showResponse ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                                    Responses
+                                </NavItem>
+                                <NavItem onClick={this.alterSelectedNavitem} className={this.state.showChart ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                                    Chart
+                                </NavItem>
+                            </Nav>
+                        </Collapse>
+                    </Navbar>
+                    {this.state.showQuiz && quiz_content}
+                    {this.state.showResponse && quiz_responses}
+                    {this.state.showChart && quiz_chart}
+                </div>
             </div>
         );
     }

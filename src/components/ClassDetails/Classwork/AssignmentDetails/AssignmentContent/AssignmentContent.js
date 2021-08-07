@@ -101,49 +101,53 @@ class AssignmentContent extends Component {
         let currentDate = new Date();
         
         let dateOverMsg = '';
+        let submitBtnDisabled = false;
 
         if(currentDate > dueDate) {
             // console.log('Due date is over!');
             dateOverMsg = 'Due date is over!';
+            submitBtnDisabled = true;
         } else {
             console.log('You can submit this assignment!');
         }
 
         return (
             <div className="assignment-content-root">
-                {/* <h3 className="text-center m-3">Submit assignment {assignmentDetails.data.title}</h3> */}
-                {dateOverMsg !== "" && <h3 className="text-info text-center">Due date was {dueDate.toString()}!<br/> You can no longer submit this assignment.</h3>}
+                <div className="assignment-content">
+                    {/* <h3 className="text-center m-3">Submit assignment {assignmentDetails.data.title}</h3> */}
+                    {dateOverMsg !== "" && <h5 className="text-center" style={{color: "#FF6263"}}>Due date was {dueDate.toString()}!<br/> You can no longer submit this assignment.</h5>}
 
-                <div className="assignment-file-div">
-                    <h4>Assignment topic: <a target="_blank" rel="noreferrer" href={assignmentDetails.data.assignmentFileUrl}>{assignmentDetails.data.title}</a></h4>
-                    <h4 style={{color: "#B4161B"}}>Due date: {dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</h4>
-                </div>
-                <div className="assignment-upload-div mt-3">
-                    {this.props.assignmentSubmissionSuccessMsg && <Alert color="success">{this.props.assignmentSubmissionSuccessMsg}</Alert>}
-                    {this.props.assignmentSubmissionErrorMsg && <Alert color="danger">{this.props.assignmentSubmissionErrorMsg}</Alert>}
-                    <form id="assignment-file-upload-form" className="assignment-uploader">
-                        <input id="assignment-file-upload" type="file" name="fileUpload" accept="application/pdf" onChange={this.handleAssignmentFile} />
+                    <div className="card assignment-file-div">
+                        <h4>Assignment topic: <a target="_blank" rel="noreferrer" href={assignmentDetails.data.assignmentFileUrl}>{assignmentDetails.data.title}</a></h4>
+                        <h5 style={{color: "#000"}}>Due date: {dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</h5>
+                    </div>
+                    <div className="assignment-upload-div mt-3">
+                        {this.props.assignmentSubmissionSuccessMsg && <Alert color="success">{this.props.assignmentSubmissionSuccessMsg}</Alert>}
+                        {this.props.assignmentSubmissionErrorMsg && <Alert color="danger">{this.props.assignmentSubmissionErrorMsg}</Alert>}
+                        <form id="assignment-file-upload-form" className="assignment-uploader">
+                            <input id="assignment-file-upload" type="file" name="fileUpload" accept="application/pdf" onChange={this.handleAssignmentFile} />
 
-                        <label htmlFor="assignment-file-upload" id="assignment-file-drag">
-                            <img id="assignment-file-image" src="#" alt="Preview" className="assignment-hidden" />
-                            <div id="assignment-start">
-                                {/* <i class="fa fa-download" aria-hidden="true"></i> */}
-                                <FontAwesomeIcon icon={faDownload} size="3x" />
-                                <div>Select a file or drag here</div>
-                                <div id="assignment-notimage" className="assignment-hidden">Please select an image</div>
-                                <span id="assignment-file-upload-btn" className="btn btn-primary">Select a file</span>
-                                <span>{this.state.assignmentFile?.name}</span>
-                            </div>
-                            <div id="assignment-response" className="assignment-hidden">
-                                <div id="assignment-messages"></div>
-                                <progress className="assignment-progress" id="assignment-file-progress" value="0">
-                                    <span>0</span>%
-                                </progress>
-                            </div>
-                        </label>
-                        <input type="submit" id="assignment-file-upload-btn" className="btn btn-primary" value="Submit" disabled={this.state.assignmentFile ? false : true} onClick={e => this.handleAssignmentSubmit(e, assignmentId)} />
-                        <div style={{color: "#FF6263"}} className="ml-2">{this.state.assignmentFile === null && <p>Please select a file(file must be in pdf format.)</p>}</div>
-                    </form>
+                            <label htmlFor="assignment-file-upload" id="assignment-file-drag">
+                                <img id="assignment-file-image" src="#" alt="Preview" className="assignment-hidden" />
+                                <div id="assignment-start">
+                                    {/* <i class="fa fa-download" aria-hidden="true"></i> */}
+                                    <FontAwesomeIcon icon={faDownload} size="3x" />
+                                    <div>Select a file or drag here</div>
+                                    <div id="assignment-notimage" className="assignment-hidden">Please select an image</div>
+                                    <span id="assignment-file-upload-btn" className="btn btn-primary">Select a file</span>
+                                    <span>{this.state.assignmentFile?.name}</span>
+                                </div>
+                                <div id="assignment-response" className="assignment-hidden">
+                                    <div id="assignment-messages"></div>
+                                    <progress className="assignment-progress" id="assignment-file-progress" value="0">
+                                        <span>0</span>%
+                                    </progress>
+                                </div>
+                            </label>
+                            <input type="submit" id="assignment-file-upload-btn" className="btn btn-primary" value="Submit" disabled={this.state.assignmentFile && !submitBtnDisabled ? false : true} style={{cursor: submitBtnDisabled ? "no-drop" : "pointer"}} onClick={e => this.handleAssignmentSubmit(e, assignmentId)} />
+                            <div style={{color: "#FF6263"}} className="ml-2">{this.state.assignmentFile === null && <p>Please select a file(file must be in pdf format.)</p>}</div>
+                        </form>
+                    </div>
                 </div>
             </div>
         );

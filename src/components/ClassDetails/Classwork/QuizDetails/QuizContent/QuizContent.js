@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './QuizContent.css';
 import { Formik, Form, Field } from 'formik';
 import { connect} from 'react-redux';
 import { Alert } from 'reactstrap';
@@ -69,7 +70,7 @@ class QuizContent extends Component {
         let checkboxDisabled = dateOverMsg === "" ? false : true;
 
         let quiz_questions = this.props.quizDetails.data.quiz_questions.map((question, idx) => (
-            <li key={`quizquestion-${idx}`} className="card mt-2 p-3" style={{backgroundColor: '#fac66b'}}>
+            <li key={`quizquestion-${idx}`} className="card mt-2 p-3" style={{backgroundColor: '#fff'}}>
                 <h3 className="card-title text-dark font-weight-bold">{idx+1}. {question.question}</h3>
                 <div>
                     <Field disabled={checkboxDisabled} type="radio" name={idx} id={`question-${idx}-answers-1`} value="option1" />
@@ -104,41 +105,43 @@ class QuizContent extends Component {
 
         // console.log(formik_initial_values);
         return (
-            <div>
-                {this.props.quizSubmissionSuccessMsg && <Alert color="success">{this.props.quizSubmissionSuccessMsg}</Alert>}
-                {this.props.quizSubmissionErrorMsg && <Alert color="danger">{this.props.quizSubmissionErrorMsg}</Alert>}
-                <h3 className="text-center m-3">Take participate in the {this.props.quizDetails.data.title}</h3>
-                {dateOverMsg !== "" && <h3 className="text-info text-center">Due date was {dueDate.toString()}!<br/> You can no longer participate in this tutorial.</h3>}
+            <div className="quiz-content-root">
+                <div className="quiz-content">
+                    {this.props.quizSubmissionSuccessMsg && <Alert color="success">{this.props.quizSubmissionSuccessMsg}</Alert>}
+                    {this.props.quizSubmissionErrorMsg && <Alert color="danger">{this.props.quizSubmissionErrorMsg}</Alert>}
+                    <h3 className="text-center m-3">Take participate in the {this.props.quizDetails.data.title}</h3>
+                    {dateOverMsg !== "" && <h5 className="text-center" style={{color: "#FF6263"}}>Due date was {dueDate.toString()}!<br/> You can no longer participate in this tutorial.</h5>}
 
-                <Formik
-                    initialValues={
-                        formik_initial_values
-                    }
-                    onSubmit={values => {
-                        this.onSubmitClick(values, this.props.quizDetails.data.quiz_questions, this.props.quizId);
-                    }}>
-                        {
-                            ({values}) => (
-                                <Form>
-                                    <div>
-                                        {/* <Field type="text" name="name" />
-                                        <Field type="number" name="age" /> */}
-                                        <ol>
-                                            {quiz_questions}
-                                        </ol>
-                                    </div>
-                                    <div className="text-center mb-3">
-                                        <button disabled={checkboxDisabled} className="btn btn-primary" type="submit">Submit</button>
-                                    </div>
-                                </Form>
-                            )
+                    <Formik
+                        initialValues={
+                            formik_initial_values
                         }
-                </Formik>
-                {/* <div className="quiz-questions" id="quiz">
-                    <ol>
-                        {quiz_questions}
-                    </ol>
-                </div> */}
+                        onSubmit={values => {
+                            this.onSubmitClick(values, this.props.quizDetails.data.quiz_questions, this.props.quizId);
+                        }}>
+                            {
+                                ({values}) => (
+                                    <Form>
+                                        <div>
+                                            {/* <Field type="text" name="name" />
+                                            <Field type="number" name="age" /> */}
+                                            <ol>
+                                                {quiz_questions}
+                                            </ol>
+                                        </div>
+                                        <div className="text-center mb-3">
+                                            <button disabled={checkboxDisabled} className="btn btn-primary" type="submit" style={{cursor: checkboxDisabled ? "no-drop": 'pointer'}}>Submit</button>
+                                        </div>
+                                    </Form>
+                                )
+                            }
+                    </Formik>
+                    {/* <div className="quiz-questions" id="quiz">
+                        <ol>
+                            {quiz_questions}
+                        </ol>
+                    </div> */}
+                </div>
             </div>
         );
     }

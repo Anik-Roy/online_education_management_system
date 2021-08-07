@@ -18,14 +18,14 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         fetchAssignmentResponses: quiz_id => dispatch(fetchAssignmentResponses(quiz_id)),
-        updateAssignmentMarks: (assignment_response_id, marks) => dispatch(updateAssignmentMarks(assignment_response_id, marks))
+        updateAssignmentMarks: (assignment_response_id, marks, selectedUserResponse) => dispatch(updateAssignmentMarks(assignment_response_id, marks, selectedUserResponse))
     }
 }
 
 const AssignmentResponses = props => {
-    const {assignmentId, fetchAssignmentResponses, updateAssignmentMarkLoading} = props;
+    const {assignmentId, fetchAssignmentResponses} = props;
     const [responseModalOpen, setResponseModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
+    // const [selectedUser, setSelectedUser] = useState(null);
     const [selectedUserResponse, setSelectedUserResponse] = useState([]);
     const [marks, setMarks] = useState("");
     
@@ -38,15 +38,16 @@ const AssignmentResponses = props => {
     }
 
     const onShowResponseClick = (userId, user_response) => {
-        setSelectedUser(userId);
+        // setSelectedUser(userId);
         setSelectedUserResponse(user_response);
     }
     
     const handleSubmit = () => {
-        props.updateAssignmentMarks(selectedUserResponse.key, marks);
-        if(props.updateAssignmentMarkSuccessMsg !== "" && props.updateAssignmentMarkErrorMsg === "") {
-            selectedUserResponse.marks = marks;
-        }
+        props.updateAssignmentMarks(selectedUserResponse.key, marks, selectedUserResponse);
+        // if(props.updateAssignmentMarkSuccessMsg !== "" && props.updateAssignmentMarkErrorMsg === "") {
+        //     console.log(selectedUserResponse);
+        //     selectedUserResponse.marks = marks;
+        // }
         toogleResponseModal();
     }
 
@@ -57,7 +58,7 @@ const AssignmentResponses = props => {
         return <tr key={assignment_response.key}>
           <th scope="row">{assignment_response.userProfile?.fullName !== "" ?  assignment_response.userProfile?.fullName : assignment_response.userProfile?.email}</th>
           <td><a href={assignment_response.assignmentFileUrl}>Click here to view submission</a></td>
-          <td>{assignment_response.marks}</td>
+          <td>{assignment_response.marks===""?"pending marks":assignment_response.marks}</td>
           <td style={{cursor: 'pointer'}} onClick={() => {onShowResponseClick(assignment_response.user_id, assignment_response); toogleResponseModal();}}><FontAwesomeIcon className="mr-3" style={{color: "black"}} icon={faHandPointUp} />Show response</td>
         </tr>
     })

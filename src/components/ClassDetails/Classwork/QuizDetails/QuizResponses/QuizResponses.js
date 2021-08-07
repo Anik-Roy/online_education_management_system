@@ -50,21 +50,22 @@ const QuizResponses = props => {
         </tr>
     ))
     return (
-        <div>
-            <Table bordered>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Total correct</th>
-                        <th>Total wrong</th>
-                        <th>User response</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {quiz_responses}
-                </tbody>
-            </Table>
-            <Modal isOpen={responseModalOpen} contentClassName="my-custom-modal" toggle={toogleResponseModal} className='my-modal-dialog'>
+        <div className="quiz-responses-root">
+            <div className="quiz-responses">
+                <Table bordered>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Total correct</th>
+                            <th>Total wrong</th>
+                            <th>User response</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {quiz_responses}
+                    </tbody>
+                </Table>
+                <Modal isOpen={responseModalOpen} contentClassName="my-custom-modal" toggle={toogleResponseModal} className='my-modal-dialog'>
                 <ModalHeader toggle={toogleResponseModal} className="text-success">{selectedUser}'s response</ModalHeader>
                 <ModalBody>
                     <div className="text-center">
@@ -111,6 +112,7 @@ const QuizResponses = props => {
                     <Button color="secondary" onClick={toogleResponseModal}>Close</Button>
                 </ModalFooter>
             </Modal>
+            </div>
         </div>
     );
 }

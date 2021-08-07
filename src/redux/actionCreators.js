@@ -1281,7 +1281,7 @@ export const updateAssignmentMarksLoading = isLoading => {
     }
 }
 
-export const updateAssignmentMarks = (assignmentResponseId, marks) => dispatch => {
+export const updateAssignmentMarks = (assignmentResponseId, marks, selectedUserResponse) => dispatch => {
     console.log(assignmentResponseId, marks);
     dispatch(updateAssignmentMarksLoading(true));
 
@@ -1289,6 +1289,8 @@ export const updateAssignmentMarks = (assignmentResponseId, marks) => dispatch =
         .then(response => {
             console.log(response);
             dispatch(updateAssignmentMarksLoading(false));
+            selectedUserResponse.marks = marks;
+            // console.log(selectedUserResponse);
             return dispatch({type: actionTypes.UPDATE_ASSIGNMENT_MARK, payload: response.data})
         })
         .catch(error => {

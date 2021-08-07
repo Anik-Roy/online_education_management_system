@@ -64,7 +64,7 @@ class AssignmentDetails extends Component {
     }
 
     render() {
-        const {classId, assignmentId} = this.props.match.params;
+        const {assignmentId} = this.props.match.params;
         // console.log(classId, assignmentId);
         const {assignmentDetails} = this.props.location.state;
 

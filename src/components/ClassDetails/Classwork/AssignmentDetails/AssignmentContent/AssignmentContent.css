@@ -1,20 +1,25 @@
 /* @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css); */
 @import url("https://fonts.googleapis.com/css?family=Roboto");
-
 .assignment-content-root {
+	background-color: #F0EBF8;
+}
+.assignment-content {
     width: 90%;
     margin: 20px auto;
 }
 .assignment-file-div {
-    background-color: #1C8D73;
+    /* background-color: #fff;
     border: 1px solid #1FAA59;
-    border-radius: 5px;
+    border-radius: 5px; */
+	width: 600px!important;
     padding: 20px;
-    color: white;
+	margin: 0px auto;
+	margin-top: 10px;
+    /* color: white; */
 }
-.assignment-file-div h4 a {
+/* .assignment-file-div h4 a {
     color: #120E43;
-}
+} */
 
 .assignment-uploader {
 	display: block;
