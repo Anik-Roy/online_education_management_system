@@ -64,7 +64,7 @@ const NavigationBar = props => {
   return (
     <div className="container-fluid">
       <Navbar color="light" light expand="md">
-        <NavbarBrand href="/">Sust Online Education</NavbarBrand>
+        <NavbarBrand href="/">SUST LMS SYSTEM</NavbarBrand>
         <NavbarToggler onClick={toggle} />
         <Collapse isOpen={isOpen} navbar>
           <Nav className="ml-auto" navbar>

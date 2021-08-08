@@ -94,7 +94,7 @@ export const auth = (userData, mode) => dispatch => {
                             console.log('not varified');
                             document.body.scrollTop = 0; // For Safari
                             document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-                            return dispatch({type: actionTypes.EMAIL_VARIFICATION_MSG, payload: "Your email is not varified! Please varify your email by clicking on the link that we send to your email."});
+                            return dispatch({type: actionTypes.EMAIL_VARIFICATION_MSG, payload: "Your email is not varified! Please varify your email by clicking on the link that we sent to your email."});
                         } else if(emailVarified === 'An error occured! Please try again.') {
                             document.body.scrollTop = 0; // For Safari
                             document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera

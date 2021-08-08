@@ -16,6 +16,9 @@
     color: white;
     font-weight: bold;
 }
+.banner-top span svg {
+    font-size: 20px;
+}
 .main-content {
     /* background-color: tomato; */
     width: 80%;

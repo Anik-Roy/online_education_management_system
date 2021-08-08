@@ -12,10 +12,15 @@ import {
     Button,
     Progress,
     Spinner,
-    Alert
+    Alert,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    UncontrolledPopover,
+    PopoverHeader
 } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperclip, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import { faPaperclip, faCopy, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {connect} from 'react-redux';
 import {fetchSingleClass, addClassContent, fetchClassContents, fetchClassComments} from '../../redux/actionCreators';
 import { firebase, storage } from '../../firebase';
@@ -59,6 +64,8 @@ class ClassDetails extends Component {
             showStream: true,
             showClasswork: false,
             showPeople: false,
+            modal: false,
+            copySuccess: ""
         };
     }
     
@@ -258,6 +265,25 @@ class ClassDetails extends Component {
         }
     }
 
+    toggle = () => {
+        this.setState({
+            modal: !this.state.modal
+        });
+    }
+
+    copyText = async classId => {
+        try {
+            await navigator.clipboard.writeText(classId);
+            this.setState({
+                copySuccess: 'copied!'
+            });
+        } catch (err) {
+            this.setState({
+                copySuccess: 'failed to copy!'
+            });
+        }
+    }
+
     componentDidMount() {
         this.props.fetchClassContents(this.props.match.params.classId)
         this.props.fetchClassComments(this.props.match.params.classId)
@@ -321,6 +347,8 @@ class ClassDetails extends Component {
                     <h3>{classDetails?.className}: {classDetails?.subject}</h3>
                     <h5>{classDetails?.firstName} {classDetails?.lastName}</h5>
                     <span>{classDetails?.email}</span>
+                    <br />
+                    <span>Class code: {classId}&nbsp;&nbsp;&nbsp;<FontAwesomeIcon style={{cursor: "pointer"}} icon={faCopy} onClick={this.toggle}/></span>
                 </div>
                 <div className="main-content">
                     <div className="class-notice border rounded p-2">
@@ -363,6 +391,23 @@ class ClassDetails extends Component {
                         {classContents}
                     </div>
                 </div>
+                <Modal isOpen={this.state.modal} toggle={this.toggle}>
+                    <ModalHeader toggle={this.toggle}>Class code</ModalHeader>
+                    <ModalBody>
+                        <div className="d-flex align-items-center form-control" style={{fontSize: "28px"}}>
+                            <p className="flex-fill m-0">{classId}</p>
+                            <FontAwesomeIcon id="PopoverClick" style={{cursor: "pointer"}} icon={faCopy} onClick={() => this.copyText(classId)} />
+                        </div>
+                        <UncontrolledPopover trigger="click" placement="bottom" target="PopoverClick">
+                            <PopoverHeader>Copied!</PopoverHeader>
+                            {/* <PopoverBody>Clicking on the triggering element makes this popover appear. Clicking on it again will make it disappear. You can select this text, but clicking away (somewhere other than the triggering element) will not dismiss this popover.</PopoverBody> */}
+                        </UncontrolledPopover>
+                    </ModalBody>
+                    {/* <ModalFooter>
+                        <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
+                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                    </ModalFooter> */}
+                </Modal>
             </div>
         );
 
