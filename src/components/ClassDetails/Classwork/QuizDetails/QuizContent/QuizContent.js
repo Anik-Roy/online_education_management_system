@@ -25,6 +25,7 @@ class QuizContent extends Component {
 
         let user_response = {};
 
+        // console.log(submitted_data);
         if(r === true) {
             let total_correct = 0;
             let total_wrong = 0;
@@ -72,25 +73,14 @@ class QuizContent extends Component {
         let quiz_questions = this.props.quizDetails.data.quiz_questions.map((question, idx) => (
             <li key={`quizquestion-${idx}`} className="card mt-2 p-3" style={{backgroundColor: '#fff'}}>
                 <h3 className="card-title text-dark font-weight-bold">{idx+1}. {question.question}</h3>
-                <div>
-                    <Field disabled={checkboxDisabled} type="radio" name={idx} id={`question-${idx}-answers-1`} value="option1" />
-                    <label htmlFor={`question-${idx}-answers-1`}>&nbsp;{question.option1}</label>
-                </div>
-
-                <div>
-                    <Field disabled={checkboxDisabled} type="radio" name={idx} id={`question-${idx}-answers-2`} value="option2" />
-                    <label htmlFor={`question-${idx}-answers-2`}>&nbsp;{question.option2}</label>
-                </div>
-
-                <div>
-                    <Field disabled={checkboxDisabled} type="radio" name={idx} id={`question-${idx}-answers-3`} value="option3" />
-                    <label htmlFor={`question-${idx}-answers-3`}>&nbsp;{question.option3}</label>
-                </div>
-
-                <div>
-                    <Field disabled={checkboxDisabled} type="radio" name={idx} id={`question-${idx}-answers-4`} value="option4" />
-                    <label htmlFor={`question-${idx}-answers-4`}>&nbsp;{question.option4}</label>
-                </div>
+                {
+                    [...Array(question.optionsLength).keys()].map(x => (
+                        <div key={`question-${idx}-option-${x}`}>
+                            <Field disabled={checkboxDisabled} type="radio" name={idx} id={`question-${idx}-answers-${x}`} value={`option${x+1}`} />
+                            <label htmlFor={`question-${idx}-answers-${x}`}>&nbsp;{question[`option${x+1}`]}</label>
+                        </div>
+                    ))
+                }
                 <div>
                     <label htmlFor={`question-${idx}-answers-4`}>Correct answer: {question.answer}</label>
                 </div>
@@ -123,8 +113,6 @@ class QuizContent extends Component {
                                 ({values}) => (
                                     <Form>
                                         <div>
-                                            {/* <Field type="text" name="name" />
-                                            <Field type="number" name="age" /> */}
                                             <ol>
                                                 {quiz_questions}
                                             </ol>

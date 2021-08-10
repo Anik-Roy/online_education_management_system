@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
-import { Formik, Form } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import MyTextInput from './MyTextInput';
 import { connect } from 'react-redux';
@@ -44,6 +44,8 @@ class Signup extends Component {
                     initialValues={{
                         fullName: '',
                         email: '',
+                        universityId: '',
+                        isTeacher: false,
                         password: '',
                         passwordConfirmation: '',
                     }}
@@ -54,6 +56,7 @@ class Signup extends Component {
                     email: Yup.string()
                         .email('Invalid email address')
                         .required('Required'),
+                    universityId: Yup.number().required('You must have to provide a student or teacher id! Contact to your university authority for id.').positive().integer(),
                     password: Yup.string().required('Password is required'),
                     passwordConfirmation: Yup.string()
                         .oneOf([Yup.ref('password'), null], 'Passwords must match')
@@ -83,6 +86,13 @@ class Signup extends Component {
                         />
 
                         <MyTextInput
+                            label="Teacher/Student ID"
+                            name="universityId"
+                            type="number"
+                            placeholder="2019822006"
+                        />
+
+                        <MyTextInput
                             label="Password"
                             name="password"
                             type="password"
@@ -95,7 +105,10 @@ class Signup extends Component {
                             type="password"
                             placeholder="Re-type your password"
                         />
-                
+                        <label>
+                            <Field type="checkbox" name="isTeacher" className="mr-2"/>Teacher account?
+                        </label>
+                        <br/><br/>
                         <button type="submit" className="btn btn-sm btn-primary mr-3">Submit</button>
                         <span>Already have an account?
                             Login <Link to="/login">here!</Link>

@@ -56,8 +56,9 @@ export const auth = (userData, mode) => dispatch => {
 
             if(mode === "signup") {
                 await axios.put(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`, {
-                    fullName: userData.fullName,
-                    email: userData.email
+                    // fullName: userData.fullName,
+                    // email: userData.email,
+                    ...userData
                 }).then(response => {
                     console.log(response);
                 }).catch(error => {

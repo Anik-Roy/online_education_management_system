@@ -29,7 +29,7 @@ class People extends Component {
                 <div key={`student-${student.key}`} className="d-flex flex-row align-items-center m-2">
                     <img width="30px" height="30px" className="rounded-circle" src="https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/s75-c-fbw=1/photo.jpg" alt="profile-pic" />    
                     {/* <span className="ml-4">{student.value.hasOwnProperty('fullName') ? student.value.fullName : student.value.email} | Student id: {student.value.studentId}</span> */}
-                    <span className="ml-4">Name: {student.value.fullName} | email: {student.value.email} | Student id: {student.value.studentId}</span>
+                    <span className="ml-4">Name: {student.value?.fullName} | email: {student.value?.email} | Student id: {student.value?.studentId}</span>
                 </div>
             ) : null;
         })

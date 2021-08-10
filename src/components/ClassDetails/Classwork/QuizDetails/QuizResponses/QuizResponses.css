@@ -5,3 +5,24 @@
     width: 80%;
     margin: 0 auto;
 }
+.quiz-response-icon {
+    font-size: 18px;
+}
+.quiz-response-icon-div {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    width: 200px;
+    height: 100px;
+}
+.my-custom-modal {
+    background-color: #F0EBF8!important;
+    width: 100vw!important;
+    height: auto;
+    min-height: 100vh!important;
+}
+.my-modal-dialog {
+    margin: 0px!important;
+}

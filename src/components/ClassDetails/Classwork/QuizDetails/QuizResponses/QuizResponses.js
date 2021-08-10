@@ -3,7 +3,7 @@ import './QuizResponses.css';
 import {connect} from 'react-redux';
 import {fetchQuizResponses} from '../../../../../redux/actionCreators';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import {faHandPointUp} from '@fortawesome/free-solid-svg-icons';
+import {faHandPointUp, faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 const mapStateToProps = state => {
@@ -38,7 +38,8 @@ const QuizResponses = props => {
         setSelectedUserResponse(user_response);
     }
 
-    console.log(props.quizResponses);
+    // console.log(props.quizResponses);
+    // console.log(selectedUserResponse);
 
 
     let quiz_responses = props.quizResponses.map(quiz_response => (
@@ -66,44 +67,45 @@ const QuizResponses = props => {
                     </tbody>
                 </Table>
                 <Modal isOpen={responseModalOpen} contentClassName="my-custom-modal" toggle={toogleResponseModal} className='my-modal-dialog'>
-                    <ModalHeader toggle={toogleResponseModal} className="text-success">{selectedUser}'s response</ModalHeader>
+                    {console.log(selectedUserResponse.userProfile?.email)}
+                    <ModalHeader toggle={toogleResponseModal}>email: {selectedUserResponse.userProfile?.email} <br/> student id: {selectedUserResponse?.userProfile?.studentId}</ModalHeader>
                     <ModalBody>
                         <div className="text-center">
-                            <h3 className="text-success">Total correct: {selectedUserResponse.total_correct}</h3>
+                            <div className="d-flex flex-row justify-content-center">
+                                <div className="quiz-response-icon-div mr-3">
+                                    <FontAwesomeIcon icon={faCheck} size="3x" className="text-success" />
+                                    <span className="h1">{selectedUserResponse.total_correct}</span>
+                                </div>
+                                <div className="quiz-response-icon-div">
+                                    <FontAwesomeIcon icon={faTimes} size="3x" className="text-danger" />
+                                    <span className="h1">{selectedUserResponse.total_wrong}</span>
+                                </div>
+                            </div>
+                            {/* <h3 className="text-success">Total correct: {selectedUserResponse.total_correct}</h3>
                             <h3 className="text-danger">Total wrong: {selectedUserResponse.total_wrong}</h3>
                             <p className="m-0">------------------------------------------</p>
-                            <h3 className="text-primary">Score total: {selectedUserResponse.total_correct}</h3>
+                            <h3 className="text-primary">Score total: {selectedUserResponse.total_correct}</h3> */}
                         </div>
                         
                         <ol>
-                            {/* question.answer === "option1" ? selectedUserResponse[idx] === question.answer ? "green": "red" : '' */}
                             {quiz_questions.map((question, idx) => {
-                                // console.log(idx, selectedUserResponse);
-
-                                return <li key={`quizquestion-${idx}`} className="card mt-2 p-3" style={{backgroundColor: '#fac66b'}}>
+                                return <li key={`quizquestion-${idx}`} className="card mt-2 p-3" style={{backgroundColor: 'white'}}>
                                     <h3 className="card-title text-dark font-weight-bold">{idx+1}. {question.question}</h3>
-                                    <div style={{display: 'flex', alignItems: 'center', padding: '10px', backgroundColor: selectedUser && selectedUserResponse?.user_answer[idx] === 'option1'? selectedUserResponse.user_answer[idx] === question.answer ? "#66BB6A": "#C62828" : ''}}>
-                                        <input disabled type="radio" name={idx} id={`question-${idx}-answers-1`} value="option1" />
-                                        <label htmlFor={`question-${idx}-answers-1`} style={{margin: 0}}>&nbsp;{question.option1}</label>
-                                    </div>
-                    
-                                    <div style={{display: 'flex', alignItems: 'center', padding: '10px', backgroundColor: selectedUser && selectedUserResponse?.user_answer[idx] === 'option2'? selectedUserResponse.user_answer[idx] === question.answer ? "#66BB6A": "#C62828" : ''}}>
-                                        <input disabled type="radio" name={idx} id={`question-${idx}-answers-2`} value="option2" />
-                                        <label htmlFor={`question-${idx}-answers-2`} style={{margin: 0}}>&nbsp;{question.option2}</label>
-                                    </div>
-                    
-                                    <div style={{display: 'flex', alignItems: 'center', padding: '10px', backgroundColor: selectedUser && selectedUserResponse?.user_answer[idx] === 'option3'? selectedUserResponse.user_answer[idx] === question.answer ? "#66BB6A": "#C62828" : ''}}>
-                                        <input disabled type="radio" name={idx} id={`question-${idx}-answers-3`} value="option3" />
-                                        <label htmlFor={`question-${idx}-answers-3`} style={{margin: 0}}>&nbsp;{question.option3}</label>
-                                    </div>
-                    
-                                    <div style={{display: 'flex', alignItems: 'center', padding: '10px', backgroundColor: selectedUser && selectedUserResponse?.user_answer[idx] === 'option4'? selectedUserResponse.user_answer[idx] === question.answer ? "#66BB6A": "#C62828" : ''}}>
-                                        <input disabled type="radio" name={idx} id={`question-${idx}-answers-4`} value="option4" />
-                                        <label htmlFor={`question-${idx}-answers-4`} style={{margin: 0}}>&nbsp;{question.option4}</label>
-                                    </div>
-                                    <div>
+                                    
+                                    {
+                                        [...Array(question.optionsLength).keys()].map(x => {
+                                            return <div style={{display: 'flex', alignItems: 'center', padding: '10px'}} key={`question-${idx}-option-${x}`}>
+                                                <input disabled type="radio" name={idx} id={`question-${idx}-answers-${x}`} value={`option${x+1}`} />
+                                                <label className="m-0" htmlFor={`question-${idx}-answers-${x}`}>&nbsp;{question[`option${x+1}`]}</label>
+                                                
+                                                {selectedUser && selectedUserResponse?.user_answer[idx] === `option${x+1}` && selectedUserResponse.user_answer[idx] !== question.answer && <FontAwesomeIcon icon={faTimes} className="quiz-response-icon text-danger ml-2 my-0" />}
+                                                {`option${x+1}` === question.answer && <FontAwesomeIcon icon={faCheck} className="quiz-response-icon text-success ml-2" />}
+                                            </div>
+                                        })
+                                    }
+                                    {/* <div>
                                         <label htmlFor={`question-${idx}-answers-4`} className="font-weight-bold">Correct answer: {question.answer}</label>
-                                    </div>
+                                    </div> */}
                                 </li>
                             })}
                         </ol>

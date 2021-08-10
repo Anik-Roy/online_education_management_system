@@ -19,6 +19,7 @@ const mapStateToProps = state => {
   return {
     token: state.token,
     userId: state.userId,
+    userProfile: state.userProfile
   }
 }
 
@@ -76,10 +77,10 @@ const NavigationBar = props => {
                 <DropdownItem onClick={props.toogleJoinClassModal}>
                   Join Class
                 </DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem onClick={props.toogleClassModal}>
+                {props.userProfile.isTeacher && <DropdownItem divider />}
+                {props.userProfile.isTeacher && <DropdownItem onClick={props.toogleClassModal}>
                   Create Class
-                </DropdownItem>
+                </DropdownItem>}
               </DropdownMenu>
             </UncontrolledDropdown>
             <UncontrolledDropdown nav inNavbar>

@@ -29,7 +29,7 @@ const Profile = props => {
 
     const toggle = () => props.updateProfileModalOpen(!props.isUpdateProfileModalOpen)
     
-    const handleSubmit = updated_content => {
+    const handleFormSubmit = updated_content => {
         props.updateProfile(props.userId, updated_content)
     }
 
@@ -109,10 +109,19 @@ const Profile = props => {
                                 <hr />
                                 <div className="row">
                                     <div className="col-sm-3">
-                                        <h6 className="mb-0">Student Id</h6>
+                                        <h6 className="mb-0">{props.userProfile.isTeacher ? "Teacher Id" : "Student Id"}</h6>
                                     </div>
                                     <div className="col-sm-9 text-secondary">
-                                        {props.userProfile.studentId}
+                                        {props.userProfile.universityId}
+                                    </div>
+                                </div>
+                                <hr />
+                                <div className="row">
+                                    <div className="col-sm-3">
+                                        <h6 className="mb-0">Role</h6>
+                                    </div>
+                                    <div className="col-sm-9 text-secondary">
+                                        {props.userProfile.isTeacher ? "Teacher" : "Student"}
                                     </div>
                                 </div>
                                 <hr />
@@ -133,8 +142,8 @@ const Profile = props => {
                         initialValues={
                             {   
                                 fullName: props.userProfile.fullName,
-                                studentId: props.userProfile.studentId,
-                                mobileNo: props.userProfile.mobileNo
+                                universityId: props.userProfile.universityId,
+                                mobileNo: props.userProfile.hasOwnProperty('mobileNo') ? props.userProfile.mobileNo : ""
                             }
                         }
                         validate={values => {
@@ -149,8 +158,8 @@ const Profile = props => {
                             if(!values.fullName) {
                                 errors.fullName = 'Required';
                             }
-                            if(!values.studentId) {
-                                errors.studentId = 'Required';
+                            if(!values.universityId) {
+                                errors.universityId = 'Required';
                             }
                             if(!values.mobileNo) {
                                 errors.mobileNo = 'Required';
@@ -158,8 +167,7 @@ const Profile = props => {
                             return errors;
                         }}
                         onSubmit={(values, { setSubmitting }) => {
-                            console.log(values);
-                            handleSubmit(JSON.stringify(values));
+                            handleFormSubmit(JSON.stringify(values));
                             setSubmitting(false);
                         }}
                         >
@@ -188,15 +196,15 @@ const Profile = props => {
                                     <p className="text-danger">{errors.email && touched.email && errors.email}</p>
                                 </div> */}
                                 <div className="form-group">
-                                    <label htmlFor="studentId">Student Id</label>
+                                    <label htmlFor="studentId">University Id</label>
                                     <input
                                         className="form-control"
-                                        id="studentId"
+                                        id="universityId"
                                         type="text"
-                                        name="studentId"
+                                        name="universityId"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.studentId}
+                                        value={values.universityId}
                                     />
                                     <p className="text-danger">{errors.email && touched.email && errors.email}</p>
                                 </div>

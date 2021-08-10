@@ -4,10 +4,7 @@ import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faFileAlt, faPlus, faAlignLeft} from '@fortawesome/free-solid-svg-icons';
-import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Modal, ModalHeader, ModalBody, ModalFooter, Input, Spinner, Alert} from 'reactstrap';
-import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
-import MyTextInput from '../../../Auth/MyTextInput';
+import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Label, Input, Spinner, Alert} from 'reactstrap';
 import {createQuiz, createAssignment} from '../../../../redux/actionCreators';
 import {connect} from 'react-redux';
 import { firebase, storage } from '../../../../firebase';
@@ -40,13 +37,18 @@ class CreateClassWork extends Component {
             dropdownOpen: false,
             quizModalOpen: false,
             addQuizModalOpen: false,
+            questionOptions: [],
+            initialValues: {question: "", answer: "", optionsLength: 0},
+            errors: {},
             title: '',
             instruction: '',
             quizQuestions: [],
             dueDate: '',
             examType: '',
             assignmentFile: null
-        }
+        };
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     onCreateClassClick = e => {
@@ -206,46 +208,137 @@ class CreateClassWork extends Component {
     toogleAddQuizModal = () => {
         this.setState({
             addQuizModalOpen: !this.state.addQuizModalOpen
-        })
+        });
+    }
+
+    addOption = () => {
+        const key = "option"+(this.state.questionOptions.length+1);
+        let tmpOptions = [...this.state.questionOptions];
+        tmpOptions.push(<FormGroup key={key}>
+            <Label htmlFor={key}>Option {this.state.questionOptions.length+1}</Label>
+            <Input
+                label={"Option "+this.state.questionOptions.length+1}
+                name={key}
+                type="text"
+                required
+                onChange={this.handleChange}
+            />
+        </FormGroup>)
+
+        let initialValues = {...this.state.initialValues, [key]: "", optionsLength: tmpOptions.length};
+
+        this.setState({
+            questionOptions: tmpOptions,
+            initialValues: initialValues
+        });
+    }
+
+    removeOption = () => {
+        const key = "option"+(this.state.questionOptions.length);
+        let tmpOptions = [...this.state.questionOptions];
+        tmpOptions.splice(-1, 1);
+
+        let initialValues = {...this.state.initialValues, optionsLength: tmpOptions.length};
+
+        delete initialValues[key];
+
+        let errors = {...this.state.errors};
+        // console.log('before delete > errors > ', errors);
+        if(errors[key]) {
+            delete errors[key];
+            // console.log('after delete > errors > ', errors);
+        }
+
+
+        this.setState({
+            questionOptions: tmpOptions,
+            initialValues: initialValues,
+            errors
+        });
+    }
+
+    handleChange = e => {
+        let initialValues = {...this.state.initialValues, [e.target.name]: e.target.value}
+        this.setState({
+            initialValues: initialValues
+        });
+    }
+
+    handleSubmit = e => {
+        e.preventDefault();
+        console.log(this.state.initialValues);
+        
+        let initialValues = {...this.state.initialValues};
+        let quizQuestions = [...this.state.quizQuestions, initialValues];
+        this.setState({
+            quizQuestions
+        });
+        
+        this.toogleAddQuizModal();
+        // let errors = {};
+        // if(this.state.initialValues.question === "") {
+        //     errors.question = "required!";    
+        // }
+        // if(this.state.initialValues.answer === "") {
+        //     errors.answer = "required!";
+        // }
+        // for(let i = 0; i < this.state.questionOptions.length; i++) {
+        //     console.log('inside loop > ', i);
+        //     if (this.state.initialValues['option'+(i+1)] === "") {
+        //         // console.log(`option${i+1} is empty!`);
+        //         errors['option'+(i+1)] = "required!";
+        //     }
+        // }
+        // console.log('outsite loop!');
+        // this.setState({
+        //     errors: errors
+        // });
+        // console.log(errors);
     }
 
     render() {
-        // let quizQuestion = [];
-        // console.log(this.state.quizQuestions);
         const {clsId} = this.props;
         
-        // console.log(clsId);
-        
+        // console.log(this.state.errors);
+
         let uiQuizQuestions = this.state.quizQuestions.map((question, idx) => {
             return (
                 <li key={`quizquestion-${idx}`}>
                     <h3>{question.question}</h3>
-                    <div>
+                    {
+                        [...Array(question.optionsLength).keys()].map(x => (
+                            <div key={`question-${idx}-option-${x}`}>
+                                <input type="radio" name={idx} id={`question-${idx}-answers-${x}`} value={`option${x+1}`} />
+                                <label htmlFor={`question-${idx}-answers-${x}`}>&nbsp;{question[`option${x+1}`]}</label>
+                            </div>
+                        ))
+                    }
+                    {/* {question.option1 && <div>
                         <input type="radio" name={idx} id={`question-${idx}-answers-1`} value="option1" />
                         <label htmlFor={`question-${idx}-answers-1`}>&nbsp;{question.option1}</label>
-                    </div>
+                    </div>}
 
-                    <div>
+                    {question.option2 && <div>
                         <input type="radio" name={idx} id={`question-${idx}-answers-2`} value="option2" />
                         <label htmlFor={`question-${idx}-answers-2`}>&nbsp;{question.option2}</label>
-                    </div>
+                    </div>}
 
-                    <div>
+                    {question.option3 && <div>
                         <input type="radio" name={idx} id={`question-${idx}-answers-3`} value="option3" />
                         <label htmlFor={`question-${idx}-answers-3`}>&nbsp;{question.option3}</label>
-                    </div>
+                    </div>}
 
-                    <div>
+                    {question.option4 && <div>
                         <input type="radio" name={idx} id={`question-${idx}-answers-4`} value="option4" />
                         <label htmlFor={`question-${idx}-answers-4`}>&nbsp;{question.option4}</label>
-                    </div>
+                    </div>} */}
                     <div>
                         <label htmlFor={`question-${idx}-answers-4`}>Correct answer: {question.answer}</label>
                     </div>
                 </li>
             )
         });
-        // console.log(uiQuizQuestions);
+        
         return (
             <div>
                 <ButtonDropdown className="mb-3" isOpen={this.state.dropdownOpen} toggle={this.toogle}>
@@ -300,74 +393,33 @@ class CreateClassWork extends Component {
                                         <ModalHeader toggle={this.toogleAddQuizModal}>{this.state.examType}</ModalHeader>
                                         <ModalBody>
                                             {/* quiz form */}
+                                            {/* {console.log(this.state.initialValues)} */}
                                             {this.state.examType==='Quiz' && 
-                                                <Formik
-                                                    initialValues={{
-                                                        question: '',
-                                                        option1: '',
-                                                        option2: '',
-                                                        option3: '',
-                                                        option4: '',
-                                                        answer: 'option1',
-                                                    }}
-                                                    validationSchema={Yup.object({
-                                                        question: Yup.string()
-                                                                    .required('Required'),
-                                                        option1: Yup.string()
-                                                                    .required('Required'),
-                                                        option2: Yup.string()
-                                                                    .required('Required'),
-                                                        option3: Yup.string()
-                                                                    .required('Required'),
-                                                        option4: Yup.string()
-                                                                    .required('Required'),
-                                                    })}
-                                                    onSubmit={(values, { setSubmitting }) => {
-                                                        // this.props.auth(values);
-                                                        this.state.quizQuestions.push(values);
+                                                <form onSubmit={this.handleSubmit}>
+                                                    <FormGroup>
+                                                        <Label htmlFor="question">Question</Label>
+                                                        <Input invalid={this.state.errors.question ? true : false} required type="text" name="question" onChange={this.handleChange} />
+                                                    </FormGroup>
 
-                                                        setTimeout(() => {
-                                                            // alert(JSON.stringify(values, null, 2));
-                                                            this.toogleAddQuizModal();
-                                                            setSubmitting(false);
-                                                        }, 400);
-                                                    }}
-                                                >
-                                                    <Form>
-                                                        <MyTextInput
-                                                            label="Question"
-                                                            name="question"
-                                                            type="text"
-                                                        />
-                                                        <MyTextInput
-                                                            label="Option 1"
-                                                            name="option1"
-                                                            type="text"
-                                                        />
-                                                        <MyTextInput
-                                                            label="Option 2"
-                                                            name="option2"
-                                                            type="text"
-                                                        />
-                                                        <MyTextInput
-                                                            label="Option 3"
-                                                            name="option3"
-                                                            type="text"
-                                                        />
-                                                        <MyTextInput
-                                                            label="Option 4"
-                                                            name="option4"
-                                                            type="text"
-                                                        />
-                                                        <Field as="select" name="answer" className="form-control mb-3">
-                                                            <option value="option1">Option 1</option>
-                                                            <option value="option2">Option 2</option>
-                                                            <option value="option3">Option 3</option>
-                                                            <option value="option4">Option 4</option>
-                                                        </Field>
-                                                        <button type="submit" className="btn btn-sm btn-primary mr-3">Submit</button>
-                                                    </Form>
-                                                </Formik>
+                                                    {this.state.questionOptions.map((option, idx) => (<div key={'question-option-'+idx}>{option}</div>))}
+                                                    
+                                                    <div className="d-flex justify-content-end">
+                                                        {this.state.questionOptions.length > 0 && <Button outline color="warning" onClick={e => this.removeOption()}>Remove option</Button>}&nbsp;
+                                                        <Button outline color="primary" onClick={e => this.addOption()}>Add option</Button>
+                                                    </div>
+                                                    <br /><br />
+                                                    {/* <Field as="select" name="answer" className="form-control mb-3">
+                                                        {this.state.questionOptions.map((option, idx) => <option key={'option-'+idx} value={`option${idx+1}`}>Option {idx+1}</option>)}
+                                                    </Field> */}
+                                                    <FormGroup>
+                                                        <Label htmlFor="answer">Answer</Label>
+                                                        <Input invalid={this.state.errors.answer ? true : false} required type="select" name="answer" onChange={this.handleChange}>
+                                                        <option key={'option'} value="">__SELECT_ANSWER__</option>
+                                                           {this.state.questionOptions.map((option, idx) => <option key={'option-'+idx} value={`option${idx+1}`}>Option {idx+1}</option>)}
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <button type="submit" className="btn btn-sm btn-primary mr-3">Submit</button>
+                                                </form>
                                             }
                                             
                                             {/* assignment form */}
