@@ -37,7 +37,7 @@ const mapDispatchToProps = dispatch => {
 
 const ClassCard = props => {
     let classCode = props.classCode;
-    // console.log(props);
+    console.log(props);
     return (
         <div className="class-root border rounded">
             <Link to={{pathname: `/class/${classCode}`, state: { classDetails: props.details }}} query={{ the: 'query' }} className="class-upper text-decoration-none">

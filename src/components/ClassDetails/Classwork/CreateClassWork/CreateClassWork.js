@@ -275,31 +275,10 @@ class CreateClassWork extends Component {
         });
         
         this.toogleAddQuizModal();
-        // let errors = {};
-        // if(this.state.initialValues.question === "") {
-        //     errors.question = "required!";    
-        // }
-        // if(this.state.initialValues.answer === "") {
-        //     errors.answer = "required!";
-        // }
-        // for(let i = 0; i < this.state.questionOptions.length; i++) {
-        //     console.log('inside loop > ', i);
-        //     if (this.state.initialValues['option'+(i+1)] === "") {
-        //         // console.log(`option${i+1} is empty!`);
-        //         errors['option'+(i+1)] = "required!";
-        //     }
-        // }
-        // console.log('outsite loop!');
-        // this.setState({
-        //     errors: errors
-        // });
-        // console.log(errors);
     }
 
     render() {
         const {clsId} = this.props;
-        
-        // console.log(this.state.errors);
 
         let uiQuizQuestions = this.state.quizQuestions.map((question, idx) => {
             return (
@@ -313,25 +292,6 @@ class CreateClassWork extends Component {
                             </div>
                         ))
                     }
-                    {/* {question.option1 && <div>
-                        <input type="radio" name={idx} id={`question-${idx}-answers-1`} value="option1" />
-                        <label htmlFor={`question-${idx}-answers-1`}>&nbsp;{question.option1}</label>
-                    </div>}
-
-                    {question.option2 && <div>
-                        <input type="radio" name={idx} id={`question-${idx}-answers-2`} value="option2" />
-                        <label htmlFor={`question-${idx}-answers-2`}>&nbsp;{question.option2}</label>
-                    </div>}
-
-                    {question.option3 && <div>
-                        <input type="radio" name={idx} id={`question-${idx}-answers-3`} value="option3" />
-                        <label htmlFor={`question-${idx}-answers-3`}>&nbsp;{question.option3}</label>
-                    </div>}
-
-                    {question.option4 && <div>
-                        <input type="radio" name={idx} id={`question-${idx}-answers-4`} value="option4" />
-                        <label htmlFor={`question-${idx}-answers-4`}>&nbsp;{question.option4}</label>
-                    </div>} */}
                     <div>
                         <label htmlFor={`question-${idx}-answers-4`}>Correct answer: {question.answer}</label>
                     </div>
@@ -408,9 +368,6 @@ class CreateClassWork extends Component {
                                                         <Button outline color="primary" onClick={e => this.addOption()}>Add option</Button>
                                                     </div>
                                                     <br /><br />
-                                                    {/* <Field as="select" name="answer" className="form-control mb-3">
-                                                        {this.state.questionOptions.map((option, idx) => <option key={'option-'+idx} value={`option${idx+1}`}>Option {idx+1}</option>)}
-                                                    </Field> */}
                                                     <FormGroup>
                                                         <Label htmlFor="answer">Answer</Label>
                                                         <Input invalid={this.state.errors.answer ? true : false} required type="select" name="answer" onChange={this.handleChange}>
@@ -459,7 +416,6 @@ class CreateClassWork extends Component {
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        {/* {console.log(uiQuizQuestions.length)} */}
                         <Button color="primary" onClick={() => this.onQuizSubmitClick(clsId)} disabled={this.state.title === '' || (uiQuizQuestions.length === 0 && this.state.assignmentFile === null) ? true : false}>Submit</Button>{' '}
                         <Button color="secondary" onClick={() => this.toogleQuizModal('close')}>Cancel</Button>
                     </ModalFooter>

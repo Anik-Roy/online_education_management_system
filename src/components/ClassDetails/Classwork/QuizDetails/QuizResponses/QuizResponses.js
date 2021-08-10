@@ -68,7 +68,7 @@ const QuizResponses = props => {
                 </Table>
                 <Modal isOpen={responseModalOpen} contentClassName="my-custom-modal" toggle={toogleResponseModal} className='my-modal-dialog'>
                     {console.log(selectedUserResponse.userProfile?.email)}
-                    <ModalHeader toggle={toogleResponseModal}>email: {selectedUserResponse.userProfile?.email} <br/> student id: {selectedUserResponse?.userProfile?.studentId}</ModalHeader>
+                    <ModalHeader toggle={toogleResponseModal}>email: {selectedUserResponse.userProfile?.email} <br/> student id: {selectedUserResponse?.userProfile?.universityId}</ModalHeader>
                     <ModalBody>
                         <div className="text-center">
                             <div className="d-flex flex-row justify-content-center">

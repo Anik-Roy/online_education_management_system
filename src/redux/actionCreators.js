@@ -271,7 +271,7 @@ export const createClass = (clsData, userId) => dispatch => {
                     .then(response => {
                         // console.log(response);
                         if(response.data !== null) {
-                            let class_info = response.data;
+                            let class_info = {...response.data};
                             console.log(class_info);
                             axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json`, classDetails)
                                 .then(async response => {
@@ -289,7 +289,8 @@ export const createClass = (clsData, userId) => dispatch => {
                                             });
                                         class_info = {
                                             key: response.data.name,
-                                            value: {...class_info, ...class_teacher_info}
+                                            value: {...class_info, ...class_teacher_info},
+                                            classCode: classCode
                                         }
                                         dispatch(joinClassLoading(false));
                                         dispatch(joinClassSuccess(class_info));
@@ -976,6 +977,13 @@ export const createQuizLoading = isLoading => {
     }
 }
 
+export const createQuizSuccess = data => {
+    return {
+        type: actionTypes.CREATE_QUIZ,
+        payload: data
+    }
+}
+
 export const createQuiz = (quiz_data) => dispatch => {
     console.log(quiz_data);
     dispatch(createQuizLoading(true));
@@ -984,6 +992,7 @@ export const createQuiz = (quiz_data) => dispatch => {
         .then(response => {
             console.log(response.data);
             dispatch(createQuizLoading(false));
+            dispatch(createQuizSuccess({key: response.data, data: quiz_data}))
         })
         .catch(error => {
             console.log(error);

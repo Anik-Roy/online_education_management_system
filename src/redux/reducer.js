@@ -263,6 +263,7 @@ export const reducer = (state=INITIAL_STATE, action) => {
             }
 
         case actionTypes.JOIN_CLASS_SUCCESS:
+            console.log(action.payload);
             return {
                 ...state,
                 isJoinClassLoading: false,

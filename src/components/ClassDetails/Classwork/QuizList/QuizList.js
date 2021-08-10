@@ -29,11 +29,12 @@ const QuizList = props => {
     }, [fetchQuizes, clsId]);
 
     let quiz_list = classQuizes.map((quiz, idx) => {
+        let dueDate = new Date(quiz.data.dueDate);
         return (
             <tr key={quiz.key}>
                 <th scope="row">{idx+1}</th>
                 <td><Link to={{pathname: `/class/${clsId}/${quiz.key}/quiz`, state: { quizDetails: quiz }}}>{quiz.data.title}</Link></td>
-                <td>{quiz.data.dueDate}</td>
+                <td>{dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</td>
                 <td></td>
             </tr>
         );

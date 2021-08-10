@@ -27,11 +27,12 @@ const AssignmentList = props => {
 
     let assignment_list = classAssignments.map((assignment, idx) => {
         console.log(assignment);
+        let dueDate = new Date(assignment.data.dueDate);
         return (
             <tr key={assignment.key}>
                 <th scope="row">{idx+1}</th>
                 <td><Link to={{pathname: `/class/${clsId}/${assignment.key}/assignment`, state: { assignmentDetails: assignment }}}>{assignment.data.title}</Link></td>
-                <td>{assignment.data.dueDate}</td>
+                <td>{dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</td>
                 <td></td>
             </tr>
         );
