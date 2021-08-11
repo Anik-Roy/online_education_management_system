@@ -25,7 +25,11 @@ const AssignmentList = props => {
         fetchAssignments(clsId)
     }, [fetchAssignments, clsId]);
 
-    let assignment_list = classAssignments.map((assignment, idx) => {
+    let sorted_class_assignments = classAssignments.sort((a, b) => {
+        return new Date(a.data.dueDate) - new Date(b.data.dueDate);
+    });
+
+    let assignment_list = sorted_class_assignments.map((assignment, idx) => {
         console.log(assignment);
         let dueDate = new Date(assignment.data.dueDate);
         return (

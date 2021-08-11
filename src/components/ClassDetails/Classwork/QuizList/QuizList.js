@@ -53,7 +53,11 @@ const QuizList = props => {
         fetchQuizes(clsId);
     }, [fetchQuizes, clsId]);
 
-    let quiz_list = classQuizes.map((quiz, idx) => {
+    let sorted_class_quizes = classQuizes.sort((a, b) => {
+        return new Date(a.data.dueDate) - new Date(b.data.dueDate);
+    });
+
+    let quiz_list = sorted_class_quizes.map((quiz, idx) => {
         let dueDate = new Date(quiz.data.dueDate);
         return (
             <tr key={quiz.key}>

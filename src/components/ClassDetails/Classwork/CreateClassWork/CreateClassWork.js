@@ -8,6 +8,7 @@ import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Mod
 import {createQuiz, createAssignment} from '../../../../redux/actionCreators';
 import {connect} from 'react-redux';
 import { firebase, storage } from '../../../../firebase';
+import 'react-circular-progressbar/dist/styles.css';
 
 const mapStateToProps = state => {
     return {
@@ -45,7 +46,9 @@ class CreateClassWork extends Component {
             quizQuestions: [],
             dueDate: '',
             examType: '',
-            assignmentFile: null
+            assignmentFile: null,
+            progress: 0,
+            fileUploading: false
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -128,7 +131,16 @@ class CreateClassWork extends Component {
                         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         console.log(progress);
-    
+                        this.setState({
+                            progress,
+                            fileUploading: true
+                        });
+
+                        if(progress >= 100) {
+                            this.setState({
+                                fileUploading: false
+                            });
+                        }
                         switch (snapshot.state) {
                             case firebase.storage.TaskState.PAUSED: // or 'paused'
                                 // console.log('Upload is paused');
@@ -179,7 +191,13 @@ class CreateClassWork extends Component {
             this.props.createQuiz(quiz_data);
         }
         this.setState({
-            quizModalOpen: false
+            quizModalOpen: false,
+            title: '',
+            instruction: '',
+            quizQuestions: [],
+            dueDate: '',
+            examType: '',
+            assignmentFile: null
         });
     }
 
@@ -299,6 +317,8 @@ class CreateClassWork extends Component {
             )
         });
         
+        console.log('exam type > ', this.state.examType === 'Assignment', 'create loading > ', this.props.createAssignmentLoading);
+
         return (
             <div>
                 <ButtonDropdown className="mb-3" isOpen={this.state.dropdownOpen} toggle={this.toogle}>
@@ -416,7 +436,8 @@ class CreateClassWork extends Component {
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <Button color="primary" onClick={() => this.onQuizSubmitClick(clsId)} disabled={this.state.title === '' || (uiQuizQuestions.length === 0 && this.state.assignmentFile === null) ? true : false}>Submit</Button>{' '}
+                        <Button color="primary" onClick={() => this.onQuizSubmitClick(clsId)} disabled={this.state.title === '' || this.state.dueDate === '' || (this.state.examType === 'Quiz' && uiQuizQuestions.length === 0) || (this.state.examType === 'Assignment' && this.state.assignmentFile === null) || ((this.state.examType === 'Assignment' && this.props.createAssignmentLoading) || this.state.fileUploading) || (this.state.examType === 'Quiz' && this.props.createQuizLoading) ? true : false}>Submit</Button>{' '}
+                        {this.state.fileUploading && <Spinner color="success" />}
                         <Button color="secondary" onClick={() => this.toogleQuizModal('close')}>Cancel</Button>
                     </ModalFooter>
                 </Modal>
