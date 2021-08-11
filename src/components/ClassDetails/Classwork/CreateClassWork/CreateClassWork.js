@@ -410,7 +410,7 @@ class CreateClassWork extends Component {
                             <div className="quiz-right-container">
                                 <div className="form-group">
                                     <label>Due Date</label><label style={{color: "red"}}>&nbsp;*</label>
-                                    <input type="datetime-local" name="bday" className="form-control" onChange={this.onDueDateInputChange} />
+                                    <input type="datetime-local" step="60" name="bday" className="form-control" onChange={this.onDueDateInputChange} />
                                 </div>
                             </div>
                         </div>

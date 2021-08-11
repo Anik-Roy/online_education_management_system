@@ -115,7 +115,7 @@ class AssignmentContent extends Component {
             <div className="assignment-content-root">
                 <div className="assignment-content">
                     {/* <h3 className="text-center m-3">Submit assignment {assignmentDetails.data.title}</h3> */}
-                    {dateOverMsg !== "" && <h5 className="text-center" style={{color: "#FF6263"}}>Due date was {dueDate.toString()}!<br/> You can no longer submit this assignment.</h5>}
+                    {dateOverMsg !== "" && <h5 className="text-center" style={{color: "#FF6263"}}>Due date was {dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}!<br/> You can no longer submit this assignment.</h5>}
 
                     <div className="card assignment-file-div">
                         <h4>Assignment topic: <a target="_blank" rel="noreferrer" href={assignmentDetails.data.assignmentFileUrl}>{assignmentDetails.data.title}</a></h4>

@@ -100,7 +100,7 @@ class QuizContent extends Component {
                     {this.props.quizSubmissionSuccessMsg && <Alert color="success">{this.props.quizSubmissionSuccessMsg}</Alert>}
                     {this.props.quizSubmissionErrorMsg && <Alert color="danger">{this.props.quizSubmissionErrorMsg}</Alert>}
                     <h3 className="text-center m-3">Take participate in the {this.props.quizDetails.data.title}</h3>
-                    {dateOverMsg !== "" && <h5 className="text-center" style={{color: "#FF6263"}}>Due date was {dueDate.toString()}!<br/> You can no longer participate in this tutorial.</h5>}
+                    {dateOverMsg !== "" && <h5 className="text-center" style={{color: "#FF6263"}}>Due date was {dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}!<br/> You can no longer participate in this tutorial.</h5>}
 
                     <Formik
                         initialValues={

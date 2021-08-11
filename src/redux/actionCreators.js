@@ -55,11 +55,10 @@ export const auth = (userData, mode) => dispatch => {
             let userId = response.data.localId;
 
             if(mode === "signup") {
-                await axios.put(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`, {
-                    // fullName: userData.fullName,
-                    // email: userData.email,
-                    ...userData
-                }).then(response => {
+                let submitted_data = {...userData};
+                delete submitted_data['password'];
+                delete submitted_data['passwordConfirmation']
+                await axios.put(`https://sust-online-learning-default-rtdb.firebaseio.com/users/${userId}.json`, submitted_data).then(response => {
                     console.log(response);
                 }).catch(error => {
                     console.log(error);

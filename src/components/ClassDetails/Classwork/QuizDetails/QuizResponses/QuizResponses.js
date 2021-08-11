@@ -5,6 +5,7 @@ import {fetchQuizResponses} from '../../../../../redux/actionCreators';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import {faHandPointUp, faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { CSVLink } from "react-csv";
 
 const mapStateToProps = state => {
     return {
@@ -41,6 +42,25 @@ const QuizResponses = props => {
     // console.log(props.quizResponses);
     // console.log(selectedUserResponse);
 
+    let headers = [
+        { label: "Email", key: "email" },
+        { label: "Full Name", key: "fullName" },
+        { label: "Student Id", key: "universityId" },
+        { label: "Mobile no", key: "mobileNo" },
+        { label: "Total correct", key: "total_correct" },
+        { label: "Total wrong", key: "total_wrong" }
+    ];
+
+    let data = props.quizResponses.map(quiz_response => (
+        {
+            email: quiz_response.userProfile.email,
+            fullName: quiz_response.userProfile.fullName,
+            universityId: quiz_response.userProfile.universityId,
+            mobileNo: quiz_response.userProfile.mobileNo,
+            total_correct: quiz_response.total_correct,
+            total_wrong: quiz_response.total_wrong
+        }
+    ));
 
     let quiz_responses = props.quizResponses.map(quiz_response => (
         <tr key={quiz_response.key}>
@@ -66,6 +86,9 @@ const QuizResponses = props => {
                         {quiz_responses}
                     </tbody>
                 </Table>
+                <CSVLink data={data} headers={headers} className="btn btn-outline-secondary">
+                    Export as csv
+                </CSVLink>
                 <Modal isOpen={responseModalOpen} contentClassName="my-custom-modal" toggle={toogleResponseModal} className='my-modal-dialog'>
                     {console.log(selectedUserResponse.userProfile?.email)}
                     <ModalHeader toggle={toogleResponseModal}>email: {selectedUserResponse.userProfile?.email} <br/> student id: {selectedUserResponse?.userProfile?.universityId}</ModalHeader>
