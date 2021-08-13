@@ -73,6 +73,7 @@ const QuizList = props => {
                     {props.fetchQuizResponsesLoading === false && props.quizResponses.length > 0 && selectedQuiz === quiz.key && <CSVLink
                         data={data}
                         headers={headers}
+                        filename={quiz.data.title+".csv"}
                         className="btn btn-outline-secondary">
                         Export as csv
                     </CSVLink>}

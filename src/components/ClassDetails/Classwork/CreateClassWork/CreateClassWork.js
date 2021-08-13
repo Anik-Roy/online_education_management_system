@@ -8,7 +8,6 @@ import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Mod
 import {createQuiz, createAssignment} from '../../../../redux/actionCreators';
 import {connect} from 'react-redux';
 import { firebase, storage } from '../../../../firebase';
-import 'react-circular-progressbar/dist/styles.css';
 
 const mapStateToProps = state => {
     return {

@@ -3,19 +3,24 @@ import './QuizContent.css';
 import { Formik, Form, Field } from 'formik';
 import { connect} from 'react-redux';
 import { Alert } from 'reactstrap';
-import { submitQuiz } from '../../../../../redux/actionCreators';
+// import lodash from 'lodash';
+import { submitQuiz, fetchQuizResponses } from '../../../../../redux/actionCreators';
+
+const _ = require('lodash');
 
 const mapStateToProps = state => {
     return {
         userId: state.userId,
         quizSubmissionSuccessMsg: state.quizSubmissionSuccessMsg,
-        quizSubmissionErrorMsg: state.quizSubmissionErrorMsg
+        quizSubmissionErrorMsg: state.quizSubmissionErrorMsg,
+        quizResponses: state.quizResponses
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        submitQuiz: user_response => dispatch(submitQuiz(user_response))
+        submitQuiz: user_response => dispatch(submitQuiz(user_response)),
+        fetchQuizResponses: quiz_id => dispatch(fetchQuizResponses(quiz_id))
     }
 }
 
@@ -54,11 +59,28 @@ class QuizContent extends Component {
         // console.log('Submission canceled!');
     }
     
+    componentDidMount() {
+        this.props.fetchQuizResponses(this.props.quizDetails.key);
+    }
+
+    componentDidUpdate() {
+        this.props.fetchQuizResponses(this.props.quizDetails.key);
+    }
+
     render() {
         let dueDate = new Date(this.props.quizDetails.data.dueDate);
         let currentDate = new Date();
-        // console.log(dueDate, currentDate);
+        console.log(this.props.quizDetails.key, this.props.quizResponses);
         
+        let already_submitted = _.find(this.props.quizResponses, {user_id: this.props.userId});
+        let submitBtnDisabled = false;
+
+        console.log(already_submitted);
+
+        if(already_submitted) {
+            submitBtnDisabled = true;
+        }
+
         let dateOverMsg = '';
 
         if(currentDate > dueDate) {
@@ -118,7 +140,7 @@ class QuizContent extends Component {
                                             </ol>
                                         </div>
                                         <div className="text-center mb-3">
-                                            <button disabled={checkboxDisabled} className="btn btn-primary" type="submit" style={{cursor: checkboxDisabled ? "no-drop": 'pointer'}}>Submit</button>
+                                            <button disabled={checkboxDisabled || submitBtnDisabled} className="btn btn-primary" type="submit" style={{cursor: checkboxDisabled || submitBtnDisabled ? "no-drop": 'pointer'}}>Submit</button>
                                         </div>
                                     </Form>
                                 )

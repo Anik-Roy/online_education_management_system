@@ -1129,6 +1129,8 @@ export const submitQuiz = user_response => dispatch => {
             console.log(response);
             dispatch(submitQuizLoading(false));
             dispatch(submitQuizSuccess());
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
         })
         .catch(error => {
             console.log(error);
@@ -1211,7 +1213,7 @@ export const fetchQuizResponses = quiz_id => dispatch => {
                         .catch(error => {
                             quiz_response = {...response.data[key], key};
                         });
-                    console.log(quiz_response);
+                    // console.log(quiz_response);
                     return quiz_response;
                 })
             ).then(quiz_responses_list => {

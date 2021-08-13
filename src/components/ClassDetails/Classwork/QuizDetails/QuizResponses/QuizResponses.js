@@ -39,9 +39,6 @@ const QuizResponses = props => {
         setSelectedUserResponse(user_response);
     }
 
-    // console.log(props.quizResponses);
-    // console.log(selectedUserResponse);
-
     let headers = [
         { label: "Email", key: "email" },
         { label: "Full Name", key: "fullName" },
@@ -62,6 +59,7 @@ const QuizResponses = props => {
         }
     ));
 
+    console.log(props.quizDetails.data.title);
     let quiz_responses = props.quizResponses.map(quiz_response => (
         <tr key={quiz_response.key}>
           <th scope="row">{quiz_response.userProfile?.fullName !== "" ?  quiz_response.userProfile?.fullName : quiz_response.userProfile?.email}</th>
@@ -86,11 +84,11 @@ const QuizResponses = props => {
                         {quiz_responses}
                     </tbody>
                 </Table>
-                <CSVLink data={data} headers={headers} className="btn btn-outline-secondary">
+                <CSVLink data={data} headers={headers} filename={props.quizDetails.data.title+".csv"} className="btn btn-outline-secondary">
                     Export as csv
                 </CSVLink>
                 <Modal isOpen={responseModalOpen} contentClassName="my-custom-modal" toggle={toogleResponseModal} className='my-modal-dialog'>
-                    {console.log(selectedUserResponse.userProfile?.email)}
+                    {/* {console.log(selectedUserResponse.userProfile?.email)} */}
                     <ModalHeader toggle={toogleResponseModal}>email: {selectedUserResponse.userProfile?.email} <br/> student id: {selectedUserResponse?.userProfile?.universityId}</ModalHeader>
                     <ModalBody>
                         <div className="text-center">

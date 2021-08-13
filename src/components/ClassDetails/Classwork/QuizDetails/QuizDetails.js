@@ -69,7 +69,7 @@ class QuizDetails extends Component {
 
         let quiz_content = <QuizContent quizId={quizId} quizDetails={quizDetails} />
         let quiz_responses = <QuizResponses quizId={quizId} quizDetails={quizDetails} />
-        let quiz_chart = <QuizChart />
+        let quiz_chart = <QuizChart quizId={quizId} quizDetails={quizDetails} />
 
         return (
             <div className="quiz-details-root">

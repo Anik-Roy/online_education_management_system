@@ -37,7 +37,7 @@ class People extends Component {
             <div className="people-root">
                 {/* Teacher */}
                 <div className="teacher">
-                    <h3 className="text-primary p-2 border-bottom border-primary">Teachers</h3>
+                    <h3 className="text-success p-2 border-bottom border-primary">Teachers</h3>
                     <div className="d-flex flex-row align-items-center m-2">
                         <img width="30px" height="30px" className="rounded-circle" src="https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/s75-c-fbw=1/photo.jpg" alt="profile-pic" />    
                         <span className="ml-4">{this.props.classTeacher}</span>
@@ -46,7 +46,7 @@ class People extends Component {
 
                 {/* Student */}
                 <div  className="teacher mt-5">
-                    <h3 className="text-primary mb-4 p-2 border-bottom border-primary">Classmates <span className="float-right">{peoples.length - 1} students</span></h3>
+                    <h3 className="text-success mb-4 p-2 border-bottom border-primary">Classmates <span className="float-right">{peoples.length - 1} students</span></h3>
                     {peoples}
                 </div>
             </div>
