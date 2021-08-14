@@ -299,8 +299,8 @@ class CreateClassWork extends Component {
 
         let uiQuizQuestions = this.state.quizQuestions.map((question, idx) => {
             return (
-                <li key={`quizquestion-${idx}`}>
-                    <h3>{question.question}</h3>
+                <li key={`quizquestion-${idx}`} className="card mt-2 p-3">
+                    <h3 className="card-title text-dark font-weight-bold">{question.question}</h3>
                     {
                         [...Array(question.optionsLength).keys()].map(x => (
                             <div key={`question-${idx}-option-${x}`}>
@@ -316,7 +316,7 @@ class CreateClassWork extends Component {
             )
         });
         
-        console.log('exam type > ', this.state.examType === 'Assignment', 'create loading > ', this.props.createAssignmentLoading);
+        // console.log('exam type > ', this.state.examType === 'Assignment', 'create loading > ', this.props.createAssignmentLoading);
 
         return (
             <div>

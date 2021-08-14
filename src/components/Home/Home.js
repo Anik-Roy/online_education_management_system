@@ -68,7 +68,6 @@ class Home extends Component {
         });
 
         let classCards = classes.map(cls => {
-            console.log(cls);
             return <ClassCard key={cls.key} details={{...cls.value}} enrollId={cls.key} classCode={cls.classCode} unenrollClass={this.props.unenrollClass} />
         });
 

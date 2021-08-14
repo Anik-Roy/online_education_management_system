@@ -13,6 +13,7 @@ import {
     Progress,
     Spinner,
     Alert,
+    Badge,
     Modal,
     ModalHeader,
     ModalBody,
@@ -22,7 +23,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperclip, faCopy, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {connect} from 'react-redux';
-import {fetchSingleClass, addClassContent, fetchClassContents, fetchClassComments} from '../../redux/actionCreators';
+import {fetchSingleClass, addClassContent, fetchClassContents, fetchClassComments, fetchQuizes, fetchAssignments} from '../../redux/actionCreators';
 import { firebase, storage } from '../../firebase';
 import ClassContent from './ClassContent/ClassContent';
 import Classwork from './Classwork/Classwork';
@@ -38,7 +39,9 @@ const mapStateToProps = state => {
         addClassContentErrorMsg: state.addClassContentErrorMsg,
         deleteClassContentSuccessMsg: state.deleteClassContentSuccessMsg,
         classContents: state.classContents,
-        classComments: state.classComments
+        classComments: state.classComments,
+        classQuizes: state.classQuizes,
+        classAssignments: state.classAssignments
     }
 }
 
@@ -47,7 +50,9 @@ const mapDispatchToProps = dispatch => {
         fetchSingleClass: clsId => dispatch(fetchSingleClass(clsId)),
         addClassContent: (text, uploadFileUrls, clsId, userId) => dispatch(addClassContent(text, uploadFileUrls, clsId, userId)),
         fetchClassContents: clsId => dispatch(fetchClassContents(clsId)),
-        fetchClassComments: clsId => dispatch(fetchClassComments(clsId))
+        fetchClassComments: clsId => dispatch(fetchClassComments(clsId)),
+        fetchQuizes: clsId => dispatch(fetchQuizes(clsId)),
+        fetchAssignments: clsId => dispatch(fetchAssignments(clsId))
     }
 }
 
@@ -65,7 +70,8 @@ class ClassDetails extends Component {
             showClasswork: false,
             showPeople: false,
             modal: false,
-            copySuccess: ""
+            copySuccess: "",
+            totClassWork: 0
         };
     }
     
@@ -233,7 +239,7 @@ class ClassDetails extends Component {
 
     alterSelectedNavitem = e => {
         const navItem = e.target.innerText;
-        // console.log(item);
+        // console.log(navItem);
         switch(navItem) {
             case 'Stream':
                 this.setState({
@@ -284,9 +290,25 @@ class ClassDetails extends Component {
         }
     }
 
+    setTotClasswork = value => {
+        this.setState({
+            totClassWork: value
+        });
+    }
+
     componentDidMount() {
-        this.props.fetchClassContents(this.props.match.params.classId)
-        this.props.fetchClassComments(this.props.match.params.classId)
+        this.props.fetchClassContents(this.props.match.params.classId);
+        this.props.fetchClassComments(this.props.match.params.classId);
+        this.props.fetchQuizes(this.props.match.params.classId);
+        this.props.fetchAssignments(this.props.match.params.classId);
+    }
+
+    componentDidUpdate(previousProps, previousState) {
+        if(previousProps.classQuizes !== this.props.classQuizes || previousProps.classAssignments !== this.props.classAssignments) {
+            this.setState({
+                totClassWork: this.props.classQuizes.length + this.props.classAssignments.length
+            });
+        }
     }
     
     render() {
@@ -403,15 +425,11 @@ class ClassDetails extends Component {
                             {/* <PopoverBody>Clicking on the triggering element makes this popover appear. Clicking on it again will make it disappear. You can select this text, but clicking away (somewhere other than the triggering element) will not dismiss this popover.</PopoverBody> */}
                         </UncontrolledPopover>
                     </ModalBody>
-                    {/* <ModalFooter>
-                        <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
-                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                    </ModalFooter> */}
                 </Modal>
             </div>
         );
 
-        let classwork = (<Classwork clsId={classId} />);
+        let classwork = (<Classwork clsId={classId} classTeacher={classDetails.user} />);
 
         // console.log(classDetails);
         let people = (<People classId={this.props.match.params.classId} classTeacher={classDetails?.hasOwnProperty('fullName') ? classDetails.fullName : classDetails?.email} classTeacherId={classDetails?.user} />);
@@ -425,9 +443,10 @@ class ClassDetails extends Component {
                             <NavItem onClick={this.alterSelectedNavitem} className={this.state.showStream ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
                                 Stream
                             </NavItem>
-                            <NavItem onClick={this.alterSelectedNavitem} className={this.state.showClasswork ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
-                                Classwork
+                            <NavItem className={this.state.showClasswork ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                                <span onClick={this.alterSelectedNavitem}>Classwork</span>&nbsp;&nbsp;<Badge color="success" pill>{this.state.totClassWork}</Badge>
                             </NavItem>
+                            
                             <NavItem onClick={this.alterSelectedNavitem} className={this.state.showPeople ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
                                 People
                             </NavItem>

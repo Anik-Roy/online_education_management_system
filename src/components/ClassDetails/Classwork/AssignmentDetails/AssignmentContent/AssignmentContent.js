@@ -5,19 +5,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Alert } from 'reactstrap';
 import { connect } from 'react-redux';
 import { firebase, storage } from '../../../../../firebase';
-import { submitAssignment } from '../../../../../redux/actionCreators';
+import { submitAssignment, fetchAssignmentResponses } from '../../../../../redux/actionCreators';
+
+const _ = require('lodash');
 
 const mapStateToProps = state => {
     return {
         userId: state.userId,
         assignmentSubmissionSuccessMsg: state.assignmentSubmissionSuccessMsg,
-        assignmentSubmissionErrorMsg: state.assignmentSubmissionErrorMsg
+        assignmentSubmissionErrorMsg: state.assignmentSubmissionErrorMsg,
+        assignmentResponses: state.assignmentResponses
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        submitAssignment: user_response => dispatch(submitAssignment(user_response))
+        submitAssignment: user_response => dispatch(submitAssignment(user_response)),
+        fetchAssignmentResponses: assignment_id => dispatch(fetchAssignmentResponses(assignment_id))
     }
 }
 
@@ -92,23 +96,37 @@ class AssignmentContent extends Component {
         }
     }
 
+    componentDidMount() {
+        this.props.fetchAssignmentResponses(this.props.assignmentDetails.key);
+    }
+
+    componentDidUpdate(previousProps, previousState) {
+        if(previousProps !== this.props) {
+            this.props.fetchAssignmentResponses(this.props.assignmentDetails.key);
+        }
+    }
+
     render() {
         const {assignmentDetails} = this.props;
         const assignmentId = assignmentDetails.key;
 
-        console.log(assignmentDetails);
+        // console.log(assignmentDetails);
         let dueDate = new Date(assignmentDetails.data.dueDate);
         let currentDate = new Date();
         
         let dateOverMsg = '';
         let submitBtnDisabled = false;
 
+        let already_submitted = _.find(this.props.assignmentResponses, {user_id: this.props.userId});
+        let alreadySubmittedMsg = '';
+
+        if(already_submitted) {
+            alreadySubmittedMsg = "You've already submitted response of this assignment!";
+        }
+
         if(currentDate > dueDate) {
-            // console.log('Due date is over!');
             dateOverMsg = 'Due date is over!';
             submitBtnDisabled = true;
-        } else {
-            console.log('You can submit this assignment!');
         }
 
         return (
@@ -116,7 +134,8 @@ class AssignmentContent extends Component {
                 <div className="assignment-content">
                     {/* <h3 className="text-center m-3">Submit assignment {assignmentDetails.data.title}</h3> */}
                     {dateOverMsg !== "" && <h5 className="text-center" style={{color: "#FF6263"}}>Due date was {dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}!<br/> You can no longer submit this assignment.</h5>}
-
+                    {alreadySubmittedMsg !== "" && <h5 className="text-center p-2 mx-auto" style={{color: "#9F6000", backgroundColor: "#FEEFB3", width: "460px"}}>{alreadySubmittedMsg}</h5>}
+                    
                     <div className="card assignment-file-div">
                         <h4>Assignment topic: <a target="_blank" rel="noreferrer" href={assignmentDetails.data.assignmentFileUrl}>{assignmentDetails.data.title}</a></h4>
                         <h5 style={{color: "#000"}}>Due date: {dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</h5>
@@ -144,7 +163,7 @@ class AssignmentContent extends Component {
                                     </progress>
                                 </div>
                             </label>
-                            <input type="submit" id="assignment-file-upload-btn" className="btn btn-primary" value="Submit" disabled={this.state.assignmentFile && !submitBtnDisabled ? false : true} style={{cursor: submitBtnDisabled ? "no-drop" : "pointer"}} onClick={e => this.handleAssignmentSubmit(e, assignmentId)} />
+                            <input type="submit" id="assignment-file-upload-btn" className="btn btn-primary" value="Submit" disabled={this.state.assignmentFile && !submitBtnDisabled && alreadySubmittedMsg === '' ? false : true} style={{cursor: submitBtnDisabled || alreadySubmittedMsg !== "" ? "no-drop" : "pointer"}} onClick={e => this.handleAssignmentSubmit(e, assignmentId)} />
                             <div style={{color: "#FF6263"}} className="ml-2">{this.state.assignmentFile === null && <p>Please select a file(file must be in pdf format.)</p>}</div>
                         </form>
                     </div>

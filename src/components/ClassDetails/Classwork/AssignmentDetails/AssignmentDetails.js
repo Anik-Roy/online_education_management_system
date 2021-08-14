@@ -10,6 +10,13 @@ import {
 import AssignmentContent from './AssignmentContent/AssignmentContent';
 import AssignmentResponses from './AssignmentResponses/AssignmentResponses';
 import AssignmentChart from './AssignmentChart/AssignmentChart';
+import {connect} from 'react-redux';
+
+const mapStateToProps = state => {
+    return {
+        userId: state.userId
+    }
+}
 
 class AssignmentDetails extends Component {
     state = {
@@ -46,7 +53,7 @@ class AssignmentDetails extends Component {
                     showResponse: true,
                     showChart: false
                 });
-                console.log('Responses');
+                // console.log('Responses');
                 break;
             case 'Chart':
                 this.setState({
@@ -55,7 +62,7 @@ class AssignmentDetails extends Component {
                     showResponse: false,
                     showChart: true
                 });
-                console.log('Chart');
+                // console.log('Chart');
                 break;
 
             default:
@@ -66,7 +73,7 @@ class AssignmentDetails extends Component {
     render() {
         const {assignmentId} = this.props.match.params;
         // console.log(classId, assignmentId);
-        const {assignmentDetails} = this.props.location.state;
+        const {assignmentDetails, classTeacher} = this.props.location.state;
 
         let assignment_content = <AssignmentContent assignmentDetails={assignmentDetails} />
         let assignment_responses = <AssignmentResponses assignmentId={assignmentId} assignmentDetails={assignmentDetails} />
@@ -81,12 +88,12 @@ class AssignmentDetails extends Component {
                             <NavItem onClick={this.alterSelectedNavitem} className={this.state.showAssignment ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
                                 Assignment
                             </NavItem>
-                            <NavItem onClick={this.alterSelectedNavitem} className={this.state.showResponse ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                            {this.props.userId === classTeacher && <NavItem onClick={this.alterSelectedNavitem} className={this.state.showResponse ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
                                 Responses
-                            </NavItem>
-                            <NavItem onClick={this.alterSelectedNavitem} className={this.state.showChart ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                            </NavItem>}
+                            {this.props.userId === classTeacher && <NavItem onClick={this.alterSelectedNavitem} className={this.state.showChart ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
                                 Chart
-                            </NavItem>
+                            </NavItem>}
                         </Nav>
                     </Collapse>
                 </Navbar>
@@ -98,4 +105,4 @@ class AssignmentDetails extends Component {
     }
 }
 
-export default AssignmentDetails;
+export default connect(mapStateToProps)(AssignmentDetails);

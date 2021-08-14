@@ -1269,7 +1269,7 @@ export const fetchAssignmentResponses = assignment_id => dispatch => {
                         .catch(error => {
                             assignment_response = {...response.data[key], key};
                         });
-                    console.log(assignment_response);
+                    // console.log(assignment_response);
                     return assignment_response;
                 })
             ).then(assignment_responses_list => {

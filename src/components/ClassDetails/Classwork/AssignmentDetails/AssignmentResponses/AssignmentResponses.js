@@ -51,7 +51,7 @@ const AssignmentResponses = props => {
         toogleResponseModal();
     }
 
-    console.log(selectedUserResponse);
+    // console.log(selectedUserResponse);
     
     let assignment_responses = props.assignmentResponses.map(assignment_response => {
         // console.log(assignment_response);

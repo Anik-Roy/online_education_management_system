@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import './QuizList.css';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -10,6 +10,7 @@ import { CSVLink } from "react-csv";
 
 const mapStateToProps = state => {
     return {
+        userId: state.userId,
         classQuizes: state.classQuizes,
         quizResponses: state.quizResponses,
         fetchQuizResponsesLoading: state.fetchQuizResponsesLoading
@@ -24,9 +25,7 @@ const mapDispatchToProps = dispatch => {
 }
 
 const QuizList = props => {
-    // console.log(props);
-    let {classQuizes, fetchQuizes, clsId} = props;
-    // console.log(classQuizes);
+    let {classQuizes, clsId} = props;
     let [selectedQuiz, setSelectedQuiz] = useState(null);
 
     let data = props.quizResponses.map(quiz_response => (
@@ -49,10 +48,10 @@ const QuizList = props => {
         { label: "Total wrong", key: "total_wrong" }
     ];
 
-    useEffect(() => {
-        fetchQuizes(clsId);
-    }, [fetchQuizes, clsId]);
-
+    // useEffect(() => {
+    //     fetchQuizes(clsId);
+    // }, [fetchQuizes, clsId]);
+    
     let sorted_class_quizes = classQuizes.sort((a, b) => {
         return new Date(a.data.dueDate) - new Date(b.data.dueDate);
     });
@@ -62,10 +61,10 @@ const QuizList = props => {
         return (
             <tr key={quiz.key}>
                 <th scope="row">{idx+1}</th>
-                <td><Link to={{pathname: `/class/${clsId}/${quiz.key}/quiz`, state: { quizDetails: quiz }}}>{quiz.data.title}</Link></td>
+                <td><Link to={{pathname: `/class/${clsId}/${quiz.key}/quiz`, state: { quizDetails: quiz, classTeacher: props.classTeacher }}}>{quiz.data.title}</Link></td>
                 <td>{dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</td>
-                <td></td>
-                <td>
+                {props.userId !== props.classTeacher && <td></td>}
+                {props.userId === props.classTeacher && <td>
                     {/* <button className="btn btn-outpine-secondary" onClick={() => console.log(quiz)}>Export as csv</button> */}
                     <FontAwesomeIcon icon={faDownload} style={{fontSize: "18px"}} onClick={() => {setSelectedQuiz(quiz.key); props.fetchQuizResponses(quiz.key)}} />&nbsp;
                     {props.fetchQuizResponsesLoading === true && selectedQuiz === quiz.key && <Spinner color="success" />}
@@ -77,7 +76,7 @@ const QuizList = props => {
                         className="btn btn-outline-secondary">
                         Export as csv
                     </CSVLink>}
-                </td>
+                </td>}
             </tr>
         );
     });
@@ -103,14 +102,14 @@ const QuizList = props => {
                 </div>
             }
             <h3>Quiz List</h3>
-            <Table>
+            <Table className="text-center">
                 <thead>
                     <tr>
                         <th>#</th>
                         <th>Quiz Title</th>
                         <th>Due Date</th>
-                        <th>Status</th>
-                        <th>Download Result</th>
+                        {props.userId !== props.classTeacher && <th>Status</th>}
+                        {props.userId === props.classTeacher && <th>Download Result</th>}
                     </tr>
                 </thead>
                 <tbody>

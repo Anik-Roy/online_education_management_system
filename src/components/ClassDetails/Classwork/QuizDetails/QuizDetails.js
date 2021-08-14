@@ -10,6 +10,13 @@ import {
 import QuizContent from './QuizContent/QuizContent';
 import QuizResponses from './QuizResponses/QuizResponses';
 import QuizChart from './QuizChart/QuizChart';
+import {connect} from 'react-redux';
+
+const mapStateToProps = state => {
+    return {
+        userId: state.userId
+    }
+}
 
 class QuizDetails extends Component {
     state = {
@@ -65,7 +72,9 @@ class QuizDetails extends Component {
 
     render() {
         const {quizId} = this.props.match.params;
-        const {quizDetails} = this.props.location.state;
+        const {quizDetails, classTeacher} = this.props.location.state;
+
+        // console.log(classTeacher);
 
         let quiz_content = <QuizContent quizId={quizId} quizDetails={quizDetails} />
         let quiz_responses = <QuizResponses quizId={quizId} quizDetails={quizDetails} />
@@ -81,12 +90,12 @@ class QuizDetails extends Component {
                                 <NavItem onClick={this.alterSelectedNavitem} className={this.state.showQuiz ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
                                     Quiz
                                 </NavItem>
-                                <NavItem onClick={this.alterSelectedNavitem} className={this.state.showResponse ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                                {this.props.userId === classTeacher && <NavItem onClick={this.alterSelectedNavitem} className={this.state.showResponse ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
                                     Responses
-                                </NavItem>
-                                <NavItem onClick={this.alterSelectedNavitem} className={this.state.showChart ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                                </NavItem>}
+                                {this.props.userId === classTeacher && <NavItem onClick={this.alterSelectedNavitem} className={this.state.showChart ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
                                     Chart
-                                </NavItem>
+                                </NavItem>}
                             </Nav>
                         </Collapse>
                     </Navbar>
@@ -99,4 +108,4 @@ class QuizDetails extends Component {
     }
 }
 
-export default QuizDetails;
+export default connect(mapStateToProps)(QuizDetails);
