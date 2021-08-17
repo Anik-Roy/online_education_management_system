@@ -7,6 +7,9 @@ import {Table, Spinner} from 'reactstrap';
 import { connect } from 'react-redux';
 import { fetchAssignments, fetchAssignmentResponses } from '../../../../redux/actionCreators';
 import { CSVLink } from "react-csv";
+import axios from 'axios';
+
+let _ = require('lodash');
 
 const mapStateToProps = state => {
     return {
@@ -28,10 +31,28 @@ const AssignmentList = props => {
     // console.log(props);
     const {clsId, classAssignments, fetchAssignments} = props;
     let [selectedAssignment, setSelectedAssignment] = useState(null);
+    let [userAssignmentResponses, setUserAssignmentResponses] = useState([]);
 
     useEffect(() => {
         fetchAssignments(clsId)
     }, [fetchAssignments, clsId]);
+
+    useEffect(() => {
+        axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/assignment_responses.json?orderBy="user_id"&equalTo="${props.userId}"`)
+            .then(response => {
+                console.log(response);
+                let user_responses = [];
+                Object.keys(response.data).map(key => {
+                    console.log(response.data[key]);
+                    user_responses.push({key, ...response.data[key]});
+                });
+                console.log(user_responses);
+                setUserAssignmentResponses(user_responses);
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }, [props.userId]);
 
     let data = props.assignmentResponses.map(assignment_response => (
         {
@@ -63,7 +84,9 @@ const AssignmentList = props => {
                 <th scope="row">{idx+1}</th>
                 <td><Link to={{pathname: `/class/${clsId}/${assignment.key}/assignment`, state: { assignmentDetails: assignment, classTeacher: props.classTeacher }}}>{assignment.data.title}</Link></td>
                 <td>{dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</td>
-                {props.userId !== props.classTeacher && <td></td>}
+                {props.userId !== props.classTeacher && <td>
+                    {_.find(userAssignmentResponses, {assignment_id: assignment.key}) ? "submitted" : "not submitted"}
+                </td>}
                 {props.userId === props.classTeacher && <td>
                     {/* <button className="btn btn-outpine-secondary" onClick={() => console.log(quiz)}>Export as csv</button> */}
                     <FontAwesomeIcon icon={faDownload} style={{fontSize: "18px"}} onClick={() => {setSelectedAssignment(assignment.key); props.fetchAssignmentResponses(assignment.key)}} />&nbsp;
