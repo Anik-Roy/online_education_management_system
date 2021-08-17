@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import './QuizList.css';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -7,6 +7,9 @@ import {faFileAlt, faTable, faSort, faDownload} from '@fortawesome/free-solid-sv
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Table, Spinner } from 'reactstrap';
 import { CSVLink } from "react-csv";
+import axios from 'axios';
+
+let _ = require('lodash');
 
 const mapStateToProps = state => {
     return {
@@ -27,6 +30,7 @@ const mapDispatchToProps = dispatch => {
 const QuizList = props => {
     let {classQuizes, clsId} = props;
     let [selectedQuiz, setSelectedQuiz] = useState(null);
+    let [userQuizResponses, setUserQuizResponses] = useState([]);
 
     let data = props.quizResponses.map(quiz_response => (
         {
@@ -52,6 +56,23 @@ const QuizList = props => {
     //     fetchQuizes(clsId);
     // }, [fetchQuizes, clsId]);
     
+    useEffect(() => {
+        axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/quiz_responses.json?orderBy="user_id"&equalTo="${props.userId}"`)
+            .then(response => {
+                console.log(response);
+                let user_responses = [];
+                Object.keys(response.data).map(key => {
+                    console.log(response.data[key]);
+                    user_responses.push({key, ...response.data[key]});
+                });
+                console.log(user_responses);
+                setUserQuizResponses(user_responses);
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }, [props.userId]);
+
     let sorted_class_quizes = classQuizes.sort((a, b) => {
         return new Date(a.data.dueDate) - new Date(b.data.dueDate);
     });
@@ -63,7 +84,9 @@ const QuizList = props => {
                 <th scope="row">{idx+1}</th>
                 <td><Link to={{pathname: `/class/${clsId}/${quiz.key}/quiz`, state: { quizDetails: quiz, classTeacher: props.classTeacher }}}>{quiz.data.title}</Link></td>
                 <td>{dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</td>
-                {props.userId !== props.classTeacher && <td></td>}
+                {props.userId !== props.classTeacher && <td>
+                    {_.find(userQuizResponses, {quiz_id: quiz.key}) ? "submitted" : "not submitted"}
+                </td>}
                 {props.userId === props.classTeacher && <td>
                     {/* <button className="btn btn-outpine-secondary" onClick={() => console.log(quiz)}>Export as csv</button> */}
                     <FontAwesomeIcon icon={faDownload} style={{fontSize: "18px"}} onClick={() => {setSelectedQuiz(quiz.key); props.fetchQuizResponses(quiz.key)}} />&nbsp;

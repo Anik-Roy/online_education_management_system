@@ -46,6 +46,7 @@ class CreateClassWork extends Component {
             dueDate: '',
             examType: '',
             assignmentFile: null,
+            assignmentLink: "",
             progress: 0,
             fileUploading: false
         };
@@ -115,69 +116,83 @@ class CreateClassWork extends Component {
 
     onQuizSubmitClick = async clsId => {
         if(this.state.examType === 'Assignment') {
-            await new Promise((resolve, reject) => {
-                let storageRef = storage.ref();
-                let folderRef = storageRef.child(`${clsId}/assignment`);
-    
-                let file = this.state.assignmentFile;
-                let {name, type} = file;
-    
-                let uploadTask = folderRef.child(name).put(file);
-    
-                // Listen for state changes, errors, and completion of the upload.
-                uploadTask.on('state_changed',
-                    (snapshot) => {
-                        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log(progress);
-                        this.setState({
-                            progress,
-                            fileUploading: true
-                        });
-
-                        if(progress >= 100) {
+            if(this.state.assignmentFile !== null) {
+                await new Promise((resolve, reject) => {
+                    let storageRef = storage.ref();
+                    let folderRef = storageRef.child(`${clsId}/assignment`);
+        
+                    let file = this.state.assignmentFile;
+                    let {name, type} = file;
+        
+                    let uploadTask = folderRef.child(name).put(file);
+        
+                    // Listen for state changes, errors, and completion of the upload.
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            console.log(progress);
                             this.setState({
-                                fileUploading: false
+                                progress,
+                                fileUploading: true
+                            });
+
+                            if(progress >= 100) {
+                                this.setState({
+                                    fileUploading: false
+                                });
+                            }
+                            switch (snapshot.state) {
+                                case firebase.storage.TaskState.PAUSED: // or 'paused'
+                                    // console.log('Upload is paused');
+                                    break;
+                                case firebase.storage.TaskState.RUNNING: // or 'running'
+                                    // console.log('Upload is running');
+                                    break;
+                                default:
+                                    // console.log('default case');
+                                    break;
+                            }
+                        },
+                        (error) => {
+                            // A full list of error codes is available at
+                            // https://firebase.google.com/docs/storage/web/handle-errors
+                            console.log(error.code);
+                            reject(error.code);
+                        },
+                        () => {
+                            // Upload completed successfully, now we can get the download URL
+                            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                                // console.log('File available at', downloadURL);
+                                const assignment_data = {
+                                    title: this.state.title,
+                                    instruction: this.state.instruction,
+                                    assignmentFileUrl: downloadURL,
+                                    name,
+                                    type,
+                                    dueDate: this.state.dueDate,
+                                    author_id: this.props.userId,
+                                    class_id: clsId
+                                }
+                                this.props.createAssignment(assignment_data);
+                                resolve();
                             });
                         }
-                        switch (snapshot.state) {
-                            case firebase.storage.TaskState.PAUSED: // or 'paused'
-                                // console.log('Upload is paused');
-                                break;
-                            case firebase.storage.TaskState.RUNNING: // or 'running'
-                                // console.log('Upload is running');
-                                break;
-                            default:
-                                // console.log('default case');
-                                break;
-                        }
-                    },
-                    (error) => {
-                        // A full list of error codes is available at
-                        // https://firebase.google.com/docs/storage/web/handle-errors
-                        console.log(error.code);
-                        reject(error.code);
-                    },
-                    () => {
-                        // Upload completed successfully, now we can get the download URL
-                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                            // console.log('File available at', downloadURL);
-                            const assignment_data = {
-                                title: this.state.title,
-                                instruction: this.state.instruction,
-                                assignmentFileUrl: downloadURL,
-                                name,
-                                type,
-                                dueDate: this.state.dueDate,
-                                author_id: this.props.userId,
-                                class_id: clsId
-                            }
-                            this.props.createAssignment(assignment_data);
-                            resolve();
-                        });
-                    }
-                );
-            });
+                    );
+                });
+            } else if(this.state.assignmentLink !== "") {
+                const assignment_data = {
+                    title: this.state.title,
+                    instruction: this.state.instruction,
+                    assignmentLink: this.state.assignmentLink,
+                    name: '',
+                    type: 'link',
+                    dueDate: this.state.dueDate,
+                    author_id: this.props.userId,
+                    class_id: clsId
+                }
+                this.props.createAssignment(assignment_data);
+            }
         } else if(this.state.examType === 'Quiz') {
             const quiz_data = {
                 title: this.state.title,
@@ -275,6 +290,13 @@ class CreateClassWork extends Component {
     }
 
     handleChange = e => {
+        if(e.target.name === "assignmentLink") {
+            this.setState({
+                [e.target.name]: e.target.value
+            });
+            return;
+        }
+
         let initialValues = {...this.state.initialValues, [e.target.name]: e.target.value}
         this.setState({
             initialValues: initialValues
@@ -364,7 +386,7 @@ class CreateClassWork extends Component {
                                     </div>
 
                                     {/* add question */}
-                                    <Button className="float-right" onClick={this.toogleAddQuizModal}>
+                                    <Button outline color="success" className="success float-right" onClick={this.toogleAddQuizModal}>
                                         <FontAwesomeIcon icon={faPlus} className="mr-3" />
                                         Add assignment/quiz
                                     </Button>
@@ -410,6 +432,15 @@ class CreateClassWork extends Component {
                                                         type="file"
                                                         onChange={this.handleAssignmentFile}
                                                     />
+                                                    <br/>or give your assignment link<br/>
+                                                    <input
+                                                        className="form-control"
+                                                        id="assignment-file-link"
+                                                        label="Assignment link"
+                                                        type="text"
+                                                        name="assignmentLink"
+                                                        onChange={this.handleChange}
+                                                    />
 
                                                     <button className="btn btn-sm btn-primary mt-2 mr-3" onClick={this.toogleAddQuizModal}>Done</button>
                                                 </div>
@@ -418,8 +449,9 @@ class CreateClassWork extends Component {
                                     </Modal>
                                     <br /><br /><br />
                                     <div className="quiz-questions" id="quiz">
-                                        {(uiQuizQuestions.length === 0 && this.state.assignmentFile === null) && <h3>You've not added any question/assignment yet! Please add question/assignment.</h3>}
+                                        {(uiQuizQuestions.length === 0 && this.state.assignmentFile === null && this.state.assignmentLink === "") && <h3>You've not added any question/assignment yet! Please add question/assignment.</h3>}
                                         {this.state.assignmentFile && <h3>Assignment file: {this.state.assignmentFile.name}</h3>}
+                                        {this.state.assignmentLink && <h3>Assignment link: <a href={this.state.assignmentLink}>{this.state.assignmentLink}</a></h3>}
                                         <ol>
                                             {uiQuizQuestions}
                                         </ol>
@@ -435,7 +467,9 @@ class CreateClassWork extends Component {
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <Button color="primary" onClick={() => this.onQuizSubmitClick(clsId)} disabled={this.state.title === '' || this.state.dueDate === '' || (this.state.examType === 'Quiz' && uiQuizQuestions.length === 0) || (this.state.examType === 'Assignment' && this.state.assignmentFile === null) || ((this.state.examType === 'Assignment' && this.props.createAssignmentLoading) || this.state.fileUploading) || (this.state.examType === 'Quiz' && this.props.createQuizLoading) ? true : false}>Submit</Button>{' '}
+                        {/* {console.log(this.state.examType === 'Assignment' && this.state.assignmentFile === null && this.state.assignmentLink === "")} */}
+                        {console.log(this.state)}
+                        <Button color="primary" onClick={() => this.onQuizSubmitClick(clsId)} disabled={this.state.title === '' || this.state.dueDate === '' || (this.state.examType === 'Quiz' && uiQuizQuestions.length === 0) || (this.state.examType === 'Assignment' && this.state.assignmentFile === null && this.state.assignmentLink === "") || ((this.state.examType === 'Assignment' && this.props.createAssignmentLoading) || this.state.fileUploading) || (this.state.examType === 'Quiz' && this.props.createQuizLoading) ? true : false}>Submit</Button>{' '}
                         {this.state.fileUploading && <Spinner color="success" />}
                         <Button color="secondary" onClick={() => this.toogleQuizModal('close')}>Cancel</Button>
                     </ModalFooter>

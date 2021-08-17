@@ -137,7 +137,7 @@ class AssignmentContent extends Component {
                     {alreadySubmittedMsg !== "" && <h5 className="text-center p-2 mx-auto" style={{color: "#9F6000", backgroundColor: "#FEEFB3", width: "460px"}}>{alreadySubmittedMsg}</h5>}
                     
                     <div className="card assignment-file-div">
-                        <h4>Assignment topic: <a target="_blank" rel="noreferrer" href={assignmentDetails.data.assignmentFileUrl}>{assignmentDetails.data.title}</a></h4>
+                        <h4>Assignment topic: <a target="_blank" rel="noreferrer" href={assignmentDetails.data.assignmentFileUrl ? assignmentDetails.data.assignmentFileUrl : assignmentDetails.data.assignmentLink }>{assignmentDetails.data.title}</a></h4>
                         <h5 style={{color: "#000"}}>Due date: {dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</h5>
                     </div>
                     <div className="assignment-upload-div mt-3">
