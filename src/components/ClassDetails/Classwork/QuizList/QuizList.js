@@ -68,14 +68,14 @@ const QuizList = props => {
     useEffect(() => {
         axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/quiz_responses.json?orderBy="user_id"&equalTo="${props.userId}"`)
             .then(response => {
-                console.log(response);
+                // console.log(response);
                 let user_responses = [];
                 Object.keys(response.data).map(key => {
                     console.log(response.data[key]);
                     user_responses.push({key, ...response.data[key]});
                     return true;
                 });
-                console.log(user_responses);
+                // console.log(user_responses);
                 setUserQuizResponses(user_responses);
             })
             .catch(error => {

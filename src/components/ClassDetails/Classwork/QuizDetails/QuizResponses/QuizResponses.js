@@ -28,10 +28,19 @@ const QuizResponses = props => {
     const [marks, setMarks] = useState({id: null, value: ''});
     const [showToast, setShowToast] = useState({id: null, value: false});
     const [show, setShow] = useState(false);
-    const {quiz_questions} = props.quizDetails.data;
+    // const {quiz_questions} = props.quizDetails.data;
+    const [quiz_questions, setQuizQuestions] = useState([]);
 
     useEffect(() => {
         fetchQuizResponses(quizId);
+        axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/quizes/${quizId}.json`)
+            .then(response => {
+                console.log(response.data);
+                setQuizQuestions(response.data.quiz_questions);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }, [fetchQuizResponses, quizId]);
 
     const toogleResponseModal = () => {
@@ -128,7 +137,7 @@ const QuizResponses = props => {
             return true;
         });
 
-        console.log(quiz_response.key);
+        // console.log(quiz_response.key);
         return <tr key={quiz_response.key}>
           <th scope="row">{quiz_response.userProfile?.fullName !== "" ?  quiz_response.userProfile?.fullName : quiz_response.userProfile?.email}</th>
           <td>{pendingMarking.length > 0 ? (<span className="text-danger">marking pending</span>): (<span className="text-success">marking completed</span>)}</td>
@@ -139,7 +148,7 @@ const QuizResponses = props => {
           <td style={{cursor: 'pointer'}} onClick={() => {onShowResponseClick(quiz_response.user_id, quiz_response); toogleResponseModal();}}><FontAwesomeIcon className="mr-3" style={{color: "black"}} icon={faHandPointUp} />Show response</td>
         </tr>
     });
-    console.log('hello world!');
+    // console.log('hello world!');
     return (
         <div className="quiz-responses-root">
             <div className="quiz-responses">
