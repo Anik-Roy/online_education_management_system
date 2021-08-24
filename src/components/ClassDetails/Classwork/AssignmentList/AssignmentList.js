@@ -45,6 +45,7 @@ const AssignmentList = props => {
                 Object.keys(response.data).map(key => {
                     console.log(response.data[key]);
                     user_responses.push({key, ...response.data[key]});
+                    return true;
                 });
                 console.log(user_responses);
                 setUserAssignmentResponses(user_responses);

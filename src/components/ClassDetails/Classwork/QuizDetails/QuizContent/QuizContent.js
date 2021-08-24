@@ -26,6 +26,7 @@ const mapDispatchToProps = dispatch => {
 
 class QuizContent extends Component {
     onSubmitClick = (submitted_data, questions, quizId) => {
+        console.log(submitted_data);
         let r = window.confirm('You response will be submitted and you will no longer be able to submit another response! Confirm submission?');
 
         let user_response = {};
@@ -36,10 +37,15 @@ class QuizContent extends Component {
             let total_wrong = 0;
     
             questions.forEach((question, idx) => {
-                if(question.answer === submitted_data[idx]) {
-                    total_correct++;
+                if(question.descriptiveQuestion) {
+                    let user_answer = submitted_data[idx];
+                    submitted_data[idx] = {user_answer: user_answer, marks: ""}
                 } else {
-                    total_wrong++;
+                    if(question.answer === submitted_data[idx]) {
+                        total_correct++;
+                    } else {
+                        total_wrong++;
+                    }
                 }
             });
 
@@ -65,7 +71,7 @@ class QuizContent extends Component {
 
     componentDidUpdate(previousProps, previousState) {
         if(previousProps !== this.props) {
-            this.props.fetchQuizResponses(this.props.quizDetails.key);
+            // this.props.fetchQuizResponses(this.props.quizDetails.key);
         }
     }
 
@@ -95,7 +101,8 @@ class QuizContent extends Component {
 
         let quiz_questions = this.props.quizDetails.data.quiz_questions.map((question, idx) => (
             <li key={`quizquestion-${idx}`} className="card mt-2 p-3">
-                <h3 className="card-title text-dark font-weight-bold">{idx+1}. {question.question}</h3>
+                <h3 className="card-title text-dark font-weight-bold">{idx+1}. {question.question}<span className="ml-2 text-info">{question.descriptiveQuestion ? `Marks: ${question.marks}` : "Marks: 1"}</span></h3>
+                {question.descriptiveQuestion && <Field as="textarea" name={idx} />}
                 {
                     [...Array(question.optionsLength).keys()].map(x => (
                         <div key={`question-${idx}-option-${x}`}>
@@ -104,16 +111,16 @@ class QuizContent extends Component {
                         </div>
                     ))
                 }
-                <div>
+                {!question.descriptiveQuestion && <div>
                     <label htmlFor={`question-${idx}-answers-4`}>Correct answer: {question.answer}</label>
-                </div>
+                </div>}
             </li>
         ));
 
         let formik_initial_values = {};
 
         this.props.quizDetails.data.quiz_questions.forEach((question, idx) => {
-            formik_initial_values[`${idx}`] = '';    
+            formik_initial_values[`${idx}`] = '';
         });
 
         // console.log(formik_initial_values);

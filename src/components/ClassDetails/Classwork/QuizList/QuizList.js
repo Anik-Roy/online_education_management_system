@@ -32,24 +32,33 @@ const QuizList = props => {
     let [selectedQuiz, setSelectedQuiz] = useState(null);
     let [userQuizResponses, setUserQuizResponses] = useState([]);
 
-    let data = props.quizResponses.map(quiz_response => (
-        {
+    let data = props.quizResponses.map(quiz_response => {
+        let total_descriptive_answer_mark = 0;
+        quiz_response.user_answer.map((answer, idx) => {
+            if(typeof answer === 'object' && answer.marks !== "") {
+                total_descriptive_answer_mark += parseInt(answer.marks);
+            }
+            return true;
+        });
+        return {
             email: quiz_response.userProfile.email,
             fullName: quiz_response.userProfile.fullName,
             universityId: quiz_response.userProfile.universityId,
             mobileNo: quiz_response.userProfile.mobileNo,
+            total_marks: total_descriptive_answer_mark + quiz_response.total_correct,
             total_correct: quiz_response.total_correct,
             total_wrong: quiz_response.total_wrong
         }
-    ));
+    });
     
     let headers = [
         { label: "Email", key: "email" },
         { label: "Full Name", key: "fullName" },
         { label: "Student Id", key: "universityId" },
         { label: "Mobile no", key: "mobileNo" },
-        { label: "Total correct", key: "total_correct" },
-        { label: "Total wrong", key: "total_wrong" }
+        { label: "Total marks", key: "total_marks"},
+        { label: "Total MCQ correct", key: "total_correct" },
+        { label: "Total MCQ wrong", key: "total_wrong" }
     ];
 
     // useEffect(() => {
@@ -64,6 +73,7 @@ const QuizList = props => {
                 Object.keys(response.data).map(key => {
                     console.log(response.data[key]);
                     user_responses.push({key, ...response.data[key]});
+                    return true;
                 });
                 console.log(user_responses);
                 setUserQuizResponses(user_responses);
@@ -106,7 +116,7 @@ const QuizList = props => {
     
     return (
         <div>
-            {quiz_list.length === 0 && <div className="class-work-info">
+            {quiz_list.length === 0 && (props.userId === props.classTeacher && <div className="class-work-info">
                     <p>Assign work to your class here</p>
                     <ul className="class-work-info-list">
                         <li className="class-work-info-list-item">
@@ -122,7 +132,7 @@ const QuizList = props => {
                             Order work the way you want students to see it
                         </li>
                     </ul>
-                </div>
+                </div>)
             }
             <h3>Quiz List</h3>
             <Table className="text-center">

@@ -370,7 +370,7 @@ class ClassDetails extends Component {
                     <h5>{classDetails?.firstName} {classDetails?.lastName}</h5>
                     <span>{classDetails?.email}</span>
                     <br />
-                    <span>Class code: {classId}&nbsp;&nbsp;&nbsp;<FontAwesomeIcon style={{cursor: "pointer"}} icon={faCopy} onClick={this.toggle}/></span>
+                    <span>Class code: {classDetails.joinCode}&nbsp;&nbsp;&nbsp;<FontAwesomeIcon style={{cursor: "pointer"}} icon={faCopy} onClick={this.toggle}/></span>
                 </div>
                 <div className="main-content">
                     <div className="class-notice border rounded p-2">
@@ -417,8 +417,8 @@ class ClassDetails extends Component {
                     <ModalHeader toggle={this.toggle}>Class code</ModalHeader>
                     <ModalBody>
                         <div className="d-flex align-items-center form-control" style={{fontSize: "28px"}}>
-                            <p className="flex-fill m-0">{classId}</p>
-                            <FontAwesomeIcon id="PopoverClick" style={{cursor: "pointer"}} icon={faCopy} onClick={() => this.copyText(classId)} />
+                            <p className="flex-fill m-0">{classDetails.joinCode}</p>
+                            <FontAwesomeIcon id="PopoverClick" style={{cursor: "pointer"}} icon={faCopy} onClick={() => this.copyText(classDetails.joinCode)} />
                         </div>
                         <UncontrolledPopover trigger="click" placement="bottom" target="PopoverClick">
                             <PopoverHeader>Copied!</PopoverHeader>

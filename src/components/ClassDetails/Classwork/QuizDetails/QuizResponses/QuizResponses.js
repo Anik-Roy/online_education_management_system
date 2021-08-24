@@ -2,10 +2,11 @@ import React, {useState, useEffect} from 'react';
 import './QuizResponses.css';
 import {connect} from 'react-redux';
 import {fetchQuizResponses} from '../../../../../redux/actionCreators';
-import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import {faHandPointUp, faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
+import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter, Toast, ToastHeader, ToastBody } from 'reactstrap';
+import {faHandPointUp, faCheck, faTimes, faSlash} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { CSVLink } from "react-csv";
+import axios from 'axios';
 
 const mapStateToProps = state => {
     return {
@@ -24,6 +25,9 @@ const QuizResponses = props => {
     const [responseModalOpen, setResponseModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedUserResponse, setSelectedUserResponse] = useState([]);
+    const [marks, setMarks] = useState({id: null, value: ''});
+    const [showToast, setShowToast] = useState({id: null, value: false});
+    const [show, setShow] = useState(false);
     const {quiz_questions} = props.quizDetails.data;
 
     useEffect(() => {
@@ -39,35 +43,103 @@ const QuizResponses = props => {
         setSelectedUserResponse(user_response);
     }
 
+    const handleChange = (e, idx) => {
+        if(e.target.name === 'marks') {
+            setMarks({id: idx, value: `${e.target.value}`});
+            console.log(e.target.value);
+        }
+    }
+
+    const updateMark = (e, idx) => {
+        e.preventDefault();
+        let tempSelectedUserResponse = {...selectedUserResponse};
+        tempSelectedUserResponse.user_answer[idx].marks = marks.value;
+        let response_id = tempSelectedUserResponse['key'];
+        let user_profile = tempSelectedUserResponse['userProfile'];
+
+        delete tempSelectedUserResponse['key'];
+        delete tempSelectedUserResponse['userProfile'];
+        console.log(tempSelectedUserResponse);
+        axios.patch(`https://sust-online-learning-default-rtdb.firebaseio.com/quiz_responses/${selectedUserResponse.key}.json`, tempSelectedUserResponse)
+            .then(response => {
+                console.log(response);
+                console.log(document.getElementById(`marks${idx}`));
+                document.getElementById(`marks${idx}`).value = "";
+                setSelectedUserResponse({...tempSelectedUserResponse, key: response_id, userProfile: user_profile});
+                setShowToast({id: idx, value: true});
+                setShow(true);
+
+                setTimeout(() => {
+                    setShowToast({id: null, value: false})
+                    setShow(false);
+                }, 3000);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        // console.log(tempSelectedUserResponse);
+    }
+
     let headers = [
         { label: "Email", key: "email" },
         { label: "Full Name", key: "fullName" },
         { label: "Student Id", key: "universityId" },
         { label: "Mobile no", key: "mobileNo" },
-        { label: "Total correct", key: "total_correct" },
-        { label: "Total wrong", key: "total_wrong" }
+        { label: "Total marks", key: "total_marks"},
+        { label: "Total MCQ correct", key: "total_correct" },
+        { label: "Total MCQ wrong", key: "total_wrong" }
     ];
 
-    let data = props.quizResponses.map(quiz_response => (
-        {
+    let data = props.quizResponses.map(quiz_response => {
+        let total_descriptive_answer_mark = 0;
+        quiz_response.user_answer.map((answer, idx) => {
+            if(typeof answer === 'object' && answer.marks !== "") {
+                total_descriptive_answer_mark += parseInt(answer.marks);
+            }
+            return true;
+        });
+        return {
             email: quiz_response.userProfile.email,
             fullName: quiz_response.userProfile.fullName,
             universityId: quiz_response.userProfile.universityId,
             mobileNo: quiz_response.userProfile.mobileNo,
+            total_marks: total_descriptive_answer_mark + quiz_response.total_correct,
             total_correct: quiz_response.total_correct,
             total_wrong: quiz_response.total_wrong
         }
-    ));
+    });
 
-    console.log(props.quizDetails.data.title);
-    let quiz_responses = props.quizResponses.map(quiz_response => (
-        <tr key={quiz_response.key}>
+    // console.log(props.quizDetails.data.title);
+    let quiz_responses = props.quizResponses.map(quiz_response => {
+        // console.log(quiz_response.user_answer);
+        const pendingMarking = [];
+        let total_descriptive_answer_mark = 0;
+        let cnt = 0;
+        quiz_response.user_answer.map((answer, idx) => {
+            // console.log(typeof answer);
+            if(typeof answer === 'object' && answer.marks === "") {
+                pendingMarking.push((<p key={`pending-marking-${quiz_response.key}-${idx}`} className="text-danger" style={{display: 'inline'}}>
+                    {cnt > 0 ? `, Q.N-${idx+1}` : `Q.N-${idx+1}`}
+                </p>));
+                cnt++;
+            } else if(typeof answer === 'object') {
+                total_descriptive_answer_mark += parseInt(answer.marks);
+            }
+            return true;
+        });
+
+        console.log(quiz_response.key);
+        return <tr key={quiz_response.key}>
           <th scope="row">{quiz_response.userProfile?.fullName !== "" ?  quiz_response.userProfile?.fullName : quiz_response.userProfile?.email}</th>
+          <td>{pendingMarking.length > 0 ? (<span className="text-danger">marking pending</span>): (<span className="text-success">marking completed</span>)}</td>
+          <td>{total_descriptive_answer_mark+quiz_response.total_correct}</td>
           <td>{quiz_response.total_correct}</td>
           <td>{quiz_response.total_wrong}</td>
+          <td>{pendingMarking.length === 0 ? (<span className="text-success">None</span>): pendingMarking}</td>
           <td style={{cursor: 'pointer'}} onClick={() => {onShowResponseClick(quiz_response.user_id, quiz_response); toogleResponseModal();}}><FontAwesomeIcon className="mr-3" style={{color: "black"}} icon={faHandPointUp} />Show response</td>
         </tr>
-    ))
+    });
+    console.log('hello world!');
     return (
         <div className="quiz-responses-root">
             <div className="quiz-responses">
@@ -75,8 +147,11 @@ const QuizResponses = props => {
                     <thead>
                         <tr>
                             <th>User</th>
-                            <th>Total correct</th>
-                            <th>Total wrong</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Total MCQ correct</th>
+                            <th>Total MCQ wrong</th>
+                            <th>Pending answer marking</th>
                             <th>User response</th>
                         </tr>
                     </thead>
@@ -92,14 +167,17 @@ const QuizResponses = props => {
                     <ModalHeader toggle={toogleResponseModal}>email: {selectedUserResponse.userProfile?.email} <br/> student id: {selectedUserResponse?.userProfile?.universityId}</ModalHeader>
                     <ModalBody>
                         <div className="text-center">
-                            <div className="d-flex flex-row justify-content-center">
-                                <div className="quiz-response-icon-div mr-3">
-                                    <FontAwesomeIcon icon={faCheck} size="3x" className="text-success" />
-                                    <span className="h1">{selectedUserResponse.total_correct}</span>
-                                </div>
-                                <div className="quiz-response-icon-div">
-                                    <FontAwesomeIcon icon={faTimes} size="3x" className="text-danger" />
-                                    <span className="h1">{selectedUserResponse.total_wrong}</span>
+                            <div>
+                                <h5 style={{fontWeight: "bold"}}>MCQ</h5>
+                                <div className="d-flex flex-row justify-content-center">
+                                    <div className="quiz-response-icon-div mr-3">
+                                        <FontAwesomeIcon icon={faCheck} size="3x" className="text-success" />
+                                        <span className="h1">{selectedUserResponse.total_correct}</span>
+                                    </div>
+                                    <div className="quiz-response-icon-div">
+                                        <FontAwesomeIcon icon={faTimes} size="3x" className="text-danger" />
+                                        <span className="h1">{selectedUserResponse.total_wrong}</span>
+                                    </div>
                                 </div>
                             </div>
                             {/* <h3 className="text-success">Total correct: {selectedUserResponse.total_correct}</h3>
@@ -111,8 +189,45 @@ const QuizResponses = props => {
                         <ol>
                             {quiz_questions.map((question, idx) => {
                                 return <li key={`quizquestion-${idx}`} className="card mt-2 p-3" style={{backgroundColor: 'white'}}>
-                                    <h3 className="card-title text-dark font-weight-bold">{idx+1}. {question.question}</h3>
-                                    
+                                    <h3 className="card-title text-dark font-weight-bold">{idx+1}. {question.question} <span style={{fontSize: "18px"}}>{selectedUser && selectedUserResponse?.user_answer[idx].marks === "" ? (<span className="text-danger">pending marking...</span>) : (<span className="text-success">marking done!</span>)}</span></h3>
+                                    {/* <p className="border border-success">Marking status: {selectedUser && selectedUserResponse?.user_answer[idx].marks}</p> */}
+                                    {question.descriptiveQuestion && <div>
+                                            <b>Student answer:</b>
+                                            <br/>
+                                            <p style={{border: '1px solid #ddd', borderRadius: '5px', padding: '10px'}}>{selectedUser && selectedUserResponse?.user_answer[idx].user_answer}</p>
+                                        </div>
+                                    }
+                                    {question.descriptiveQuestion && <form onSubmit={e => updateMark(e, idx)}>
+                                            <div className="form-group">
+                                                {/* <label htmlFor="marks"> Give marks out of {question.marks}</label> */}
+                                                <div className="d-flex align-items-center">
+                                                    <input className="form-control" style={{width: "200px"}} name="marks" id={`marks${idx}`} type="number" min="0" max={question.marks} placeholder={selectedUser && selectedUserResponse?.user_answer[idx].marks} onChange={e => handleChange(e, idx)} />
+                                                    <div style={{transform: "rotateY(0deg) rotate(70deg)"}}>
+                                                        <FontAwesomeIcon icon={faSlash} size="2x" />
+                                                    </div>
+                                                    <span style={{fontSize: "50px"}}>{question.marks}</span>
+                                                </div>
+                                            </div>
+                                            <div style={{display: "flex", alignItems: "center"}}>
+                                                {marks.id === idx && marks.value !== "" && <input className="btn btn-outline-success" type="submit" value="Update"/>}
+                                                {
+                                                    showToast.id === idx && showToast.value &&
+                                                        (
+                                                            <div className="p-3 my-2 rounded">
+                                                                <Toast isOpen={show}>
+                                                                    <ToastHeader>
+                                                                        Marks updated successfully!
+                                                                    </ToastHeader>
+                                                                    <ToastBody>
+                                                                        New mark {'->'} {selectedUserResponse.user_answer[idx].marks}
+                                                                    </ToastBody>
+                                                                </Toast>
+                                                            </div>
+                                                        )
+                                                }
+                                            </div>
+                                        </form>
+                                    }
                                     {
                                         [...Array(question.optionsLength).keys()].map(x => {
                                             return <div style={{display: 'flex', alignItems: 'center', padding: '10px'}} key={`question-${idx}-option-${x}`}>

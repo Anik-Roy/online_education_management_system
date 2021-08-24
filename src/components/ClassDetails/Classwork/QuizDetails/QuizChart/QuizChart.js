@@ -85,34 +85,46 @@ class QuizChart extends Component {
 
             quiz_responses_list.map(res => {
                 // for line chart
-                let tot_student = lineMap.get(res.total_correct);
+                let total_marks = res.total_correct;
+
+                res.user_answer.map(answer => {
+                    // console.log(typeof answer);
+                    if(typeof answer === "object" && answer.marks !== "") {
+                        total_marks += parseInt(answer.marks);
+                    }
+                    return true;
+                });
+
+                let tot_student = lineMap.get(total_marks);
                 
                 if(tot_student === undefined) {
-                    lineMap.set(res.total_correct, 1);
+                    lineMap.set(total_marks, 1);
                 } else {
-                    lineMap.set(res.total_correct, tot_student+1);
+                    lineMap.set(total_marks, tot_student+1);
                 }
 
                 // for correct and wrong answer chart
                 res.user_answer.map((answer, idx) => {
-                    // correct answer
-                    let correct = correctAnswerMap.get(`question${idx+1}`);  
-                    if(correct === undefined) {
-                        correctAnswerMap.set(`question${idx+1}`, 0);
-                    }
-                    correct = correctAnswerMap.get(`question${idx+1}`);
-                    if(answer === this.props.quizDetails.data.quiz_questions[idx].answer) {
-                        correctAnswerMap.set(`question${idx+1}`, correct+1);
-                    }
+                    if(typeof answer !== 'object') {
+                        // correct answer
+                        let correct = correctAnswerMap.get(`question${idx+1}`);  
+                        if(correct === undefined) {
+                            correctAnswerMap.set(`question${idx+1}`, 0);
+                        }
+                        correct = correctAnswerMap.get(`question${idx+1}`);
+                        if(answer === this.props.quizDetails.data.quiz_questions[idx].answer) {
+                            correctAnswerMap.set(`question${idx+1}`, correct+1);
+                        }
 
-                    // wrong answer
-                    let wrong = wrongAnswerMap.get(`question${idx+1}`);  
-                    if(wrong === undefined) {
-                        wrongAnswerMap.set(`question${idx+1}`, 0);
-                    }
-                    wrong = wrongAnswerMap.get(`question${idx+1}`);
-                    if(answer !== this.props.quizDetails.data.quiz_questions[idx].answer) {
-                        wrongAnswerMap.set(`question${idx+1}`, wrong+1);
+                        // wrong answer
+                        let wrong = wrongAnswerMap.get(`question${idx+1}`);  
+                        if(wrong === undefined) {
+                            wrongAnswerMap.set(`question${idx+1}`, 0);
+                        }
+                        wrong = wrongAnswerMap.get(`question${idx+1}`);
+                        if(answer !== this.props.quizDetails.data.quiz_questions[idx].answer) {
+                            wrongAnswerMap.set(`question${idx+1}`, wrong+1);
+                        }
                     }
                     return true;
                 });

@@ -242,16 +242,66 @@ export const createClassSuccess = data => {
     }
 }
 
+// const checkIfCodeAvailable = async () => {
+//     let uuid = [];
+//     // a.push(Math.floor(Math.random()*10));
+
+//     for(let i = 0; i < 6; i++) {
+//         uuid.push(Math.floor(Math.random()*10));
+//     }
+//     uuid = uuid.join('');
+//     console.log(uuid);
+//     await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/classes.json?orderBy="joinCode"&equalTo="${uuid}"`)
+//         .then(response => {
+//             console.log(response.data);
+//             return {
+//                 codeAvailable: true,
+//                 code: uuid
+//             }
+//         })
+//         .catch(error => {
+//             console.log(error);
+//             return {
+//                 codeAvailable: false
+//             }
+//         });
+// }
+
 export const createClass = (clsData, userId) => dispatch => {
     dispatch(createClassLoading(true));
+
+    // let codeAvailable = false;
+    let joinCode = '';
+
+    let uuid = [];
+    // a.push(Math.floor(Math.random()*10));
+
+    for(let i = 0; i < 6; i++) {
+        uuid.push(Math.floor(Math.random()*10));
+    }
+    uuid = uuid.join('');
+    // console.log(uuid);
+    joinCode = uuid;
+
+    // while(joinCode === '') {
+    //     let payload = checkIfCodeAvailable();
+
+    //     if(payload.codeAvailable) {
+    //         joinCode = payload.code
+    //     }
+    // }
+
+    console.log(joinCode);
 
     let classDetails = {
         className: clsData.className,
         section: clsData.section,
         subject: clsData.subject,
         room: clsData.room,
+        joinCode: joinCode,
         user: userId
     }
+
     axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/classes.json`, classDetails)
         .then(response => {
             console.log(response);
@@ -262,6 +312,7 @@ export const createClass = (clsData, userId) => dispatch => {
                 let classCode = response.data.name;
                 classDetails = {
                     classCode: classCode,
+                    joinCode: joinCode,
                     user_id: userId,
                     joined_at: new Date()
                 }
@@ -344,10 +395,10 @@ export const joinClassFailed = errMsg => {
     }
 }
 
-const alreadyJoined = async (classCode, userId) => {
+const alreadyJoined = async (joinCode, userId) => {
     let response = await axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json?orderBy="user_id"&equalTo="${userId}"`);
     for(let key in response.data) {
-        if(response.data[key].classCode === classCode) {
+        if(response.data[key].joinCode === joinCode) {
             return true;
         }
     }
@@ -356,12 +407,6 @@ const alreadyJoined = async (classCode, userId) => {
 
 export const joinClass = (classCode, userId) => dispatch => {
     dispatch(joinClassLoading(true));
-
-    let classDetails = {
-        classCode: classCode,
-        user_id: userId,
-        joined_at: new Date()
-    }
 
     console.log(classCode, userId);
     alreadyJoined(classCode, userId)
@@ -377,11 +422,25 @@ export const joinClass = (classCode, userId) => dispatch => {
                 })
             } else {
                 // console.log("Not enrolled yet!");
-                axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/classes/${classCode}.json`)
+                axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/classes.json?orderBy="joinCode"&equalTo="${classCode}"`)
                     .then(response => {
                         // console.log(response);
                         if(response.data !== null) {
-                            let class_info = response.data;
+                            let classDetails = {}
+                            let class_info = {};
+
+                            Object.keys(response.data).map(key => {
+                                // console.log(key);
+                                classDetails = {
+                                    classCode: key,
+                                    joinCode: classCode,
+                                    user_id: userId,
+                                    joined_at: new Date()
+                                }
+                                class_info = response.data[key];
+                                return true;
+                            });
+                            // let class_info = response.data;
                             console.log(class_info);
                             axios.post(`https://sust-online-learning-default-rtdb.firebaseio.com/enrolled_class.json`, classDetails)
                                 .then(async response => {
@@ -400,7 +459,7 @@ export const joinClass = (classCode, userId) => dispatch => {
                                         class_info = {
                                             key: response.data.name,
                                             value: {...class_info, ...class_teacher_info},
-                                            classCode: classCode
+                                            classCode: classDetails.classCode
                                         }
                                         dispatch(joinClassLoading(false));
                                         dispatch(joinClassSuccess(class_info));
@@ -977,6 +1036,7 @@ export const createQuizLoading = isLoading => {
 }
 
 export const createQuizSuccess = data => {
+    console.log(data);
     return {
         type: actionTypes.CREATE_QUIZ,
         payload: data
@@ -991,7 +1051,7 @@ export const createQuiz = (quiz_data) => dispatch => {
         .then(response => {
             console.log(response.data);
             dispatch(createQuizLoading(false));
-            dispatch(createQuizSuccess({key: response.data, data: quiz_data}))
+            dispatch(createQuizSuccess({key: response.data.name, data: quiz_data}))
         })
         .catch(error => {
             console.log(error);
@@ -1025,7 +1085,7 @@ export const createAssignment = assignment_data => dispatch => {
         .then(response => {
             console.log(response.data);
             dispatch(createAssignmentLoading(false));
-            dispatch(createAssignmentSuccess({key: response.data, data: assignment_data}));
+            dispatch(createAssignmentSuccess({key: response.data.name, data: assignment_data}));
         })
         .catch(error => {
             console.log(error);

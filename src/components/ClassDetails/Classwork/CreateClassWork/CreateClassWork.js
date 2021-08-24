@@ -3,7 +3,7 @@ import './CreateClassWork.css';
 import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faFileAlt, faPlus, faAlignLeft} from '@fortawesome/free-solid-svg-icons';
+import {faFileAlt, faPlus, faAlignLeft, faCheck} from '@fortawesome/free-solid-svg-icons';
 import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Label, Input, Spinner, Alert} from 'reactstrap';
 import {createQuiz, createAssignment} from '../../../../redux/actionCreators';
 import {connect} from 'react-redux';
@@ -38,11 +38,12 @@ class CreateClassWork extends Component {
             quizModalOpen: false,
             addQuizModalOpen: false,
             questionOptions: [],
-            initialValues: {question: "", answer: "", optionsLength: 0},
+            initialValues: {question: "", answer: "", descriptiveQuestion: false, optionsLength: 0},
             errors: {},
             title: '',
             instruction: '',
             quizQuestions: [],
+            quizQuestionDescriptive: false,
             dueDate: '',
             examType: '',
             assignmentFile: null,
@@ -112,6 +113,28 @@ class CreateClassWork extends Component {
             document.getElementById('assignment-file-input').value = '';
         }
         return null;
+    }
+
+    resetState = () => {
+        this.setState({
+            editorState: EditorState.createEmpty(),
+            dropdownOpen: false,
+            quizModalOpen: false,
+            addQuizModalOpen: false,
+            questionOptions: [],
+            initialValues: {question: "", answer: "", descriptiveQuestion: false, optionsLength: 0},
+            errors: {},
+            title: '',
+            instruction: '',
+            quizQuestions: [],
+            quizQuestionDescriptive: false,
+            dueDate: '',
+            examType: '',
+            assignmentFile: null,
+            assignmentLink: "",
+            progress: 0,
+            fileUploading: false
+        });
     }
 
     onQuizSubmitClick = async clsId => {
@@ -194,9 +217,11 @@ class CreateClassWork extends Component {
                 this.props.createAssignment(assignment_data);
             }
         } else if(this.state.examType === 'Quiz') {
+            console.log(this.state.quizQuestions);
             const quiz_data = {
                 title: this.state.title,
                 instruction: this.state.instruction,
+                // quizQuestionDescriptive: this.state.quizQuestionDescriptive,
                 quiz_questions: this.state.quizQuestions,
                 dueDate: this.state.dueDate,
                 author_id: this.props.userId,
@@ -204,15 +229,19 @@ class CreateClassWork extends Component {
             }
             this.props.createQuiz(quiz_data);
         }
-        this.setState({
-            quizModalOpen: false,
-            title: '',
-            instruction: '',
-            quizQuestions: [],
-            dueDate: '',
-            examType: '',
-            assignmentFile: null
-        });
+
+        this.resetState();
+
+        // this.setState({
+        //     quizModalOpen: false,
+        //     title: '',
+        //     instruction: '',
+        //     quizQuestions: [],
+        //     quizQuestionDescriptive: false,
+        //     dueDate: '',
+        //     examType: '',
+        //     assignmentFile: null
+        // });
     }
 
     toogle = () => {
@@ -239,7 +268,9 @@ class CreateClassWork extends Component {
     
     toogleAddQuizModal = () => {
         this.setState({
-            addQuizModalOpen: !this.state.addQuizModalOpen
+            addQuizModalOpen: !this.state.addQuizModalOpen,
+            initialValues: {question: "", answer: "", descriptiveQuestion: false, optionsLength: 0},
+            questionOptions: []
         });
     }
 
@@ -281,7 +312,6 @@ class CreateClassWork extends Component {
             // console.log('after delete > errors > ', errors);
         }
 
-
         this.setState({
             questionOptions: tmpOptions,
             initialValues: initialValues,
@@ -297,7 +327,26 @@ class CreateClassWork extends Component {
             return;
         }
 
-        let initialValues = {...this.state.initialValues, [e.target.name]: e.target.value}
+        if(e.target.name === "quizQuestionDescriptive") {
+            console.log(e.target.name, e.target.checked);
+            let initialValues = {...this.state.initialValues, descriptiveQuestion: e.target.checked, marks: 0}
+            this.setState({
+                [e.target.name]: e.target.checked,
+                initialValues: initialValues
+            });
+            return;
+        }
+
+        if(e.target.name === "marks") {
+            console.log(e.target.name, e.target.value);
+            let initialValues = {...this.state.initialValues, descriptiveQuestion: true, [e.target.name]: e.target.value}
+            this.setState({
+                initialValues: initialValues
+            });
+            return;
+        }
+
+        let initialValues = {...this.state.initialValues, [e.target.name]: e.target.value, descriptiveQuestion: false}
         this.setState({
             initialValues: initialValues
         });
@@ -309,9 +358,18 @@ class CreateClassWork extends Component {
         
         let initialValues = {...this.state.initialValues};
         let quizQuestions = [...this.state.quizQuestions, initialValues];
+        console.log(quizQuestions);
         this.setState({
-            quizQuestions
+            quizQuestions,
         });
+
+        setTimeout(() => {
+            this.setState({
+                initialValues: {question: "", answer: "", descriptiveQuestion: false, optionsLength: 0},
+                questionOptions: [],
+                quizQuestionDescriptive: false
+            })
+        }, 1000);
         
         this.toogleAddQuizModal();
     }
@@ -322,18 +380,22 @@ class CreateClassWork extends Component {
         let uiQuizQuestions = this.state.quizQuestions.map((question, idx) => {
             return (
                 <li key={`quizquestion-${idx}`} className="card mt-2 p-3">
-                    <h3 className="card-title text-dark font-weight-bold">{question.question}</h3>
+                    <h3 className="card-title text-dark font-weight-bold">{idx+1}.&nbsp;{question.question}<span className="ml-2 text-info">{question.descriptiveQuestion ? `Marks: ${question.marks}` : "Marks: 1"}</span></h3>
+                    {/* {question.descriptiveQuestion? "descriptive > true" : "descriptive > false"} */}
+                    {/* {question.descriptiveQuestion ? `${question.marks}` : "mark is 1"} */}
                     {
                         [...Array(question.optionsLength).keys()].map(x => (
-                            <div key={`question-${idx}-option-${x}`}>
+                            <div style={{display: 'flex', alignItems: 'center', padding: '10px'}} key={`question-${idx}-option-${x}`}>
                                 <input type="radio" name={idx} id={`question-${idx}-answers-${x}`} value={`option${x+1}`} />
-                                <label htmlFor={`question-${idx}-answers-${x}`}>&nbsp;{question[`option${x+1}`]}</label>
+                                <label className="m-0" htmlFor={`question-${idx}-answers-${x}`}>&nbsp;{question[`option${x+1}`]}</label>
+                                {`option${x+1}` === question.answer && <FontAwesomeIcon icon={faCheck} className="quiz-response-icon text-success ml-2" />}
                             </div>
                         ))
                     }
-                    <div>
+                    {/* {console.log(question.optionsLength)} */}
+                    {!question.descriptiveQuestion && <div>
                         <label htmlFor={`question-${idx}-answers-4`}>Correct answer: {question.answer}</label>
-                    </div>
+                    </div>}
                 </li>
             )
         });
@@ -404,18 +466,33 @@ class CreateClassWork extends Component {
 
                                                     {this.state.questionOptions.map((option, idx) => (<div key={'question-option-'+idx}>{option}</div>))}
                                                     
-                                                    <div className="d-flex justify-content-end">
+                                                    <div className="descriptive-question">
+                                                        <FormGroup check>
+                                                            <Label check>
+                                                            <Input type="checkbox" name="quizQuestionDescriptive" onChange={this.handleChange} />{' '}
+                                                                Descriptive Question?
+                                                            </Label>
+                                                        </FormGroup>
+                                                    </div>
+                                                    {this.state.quizQuestionDescriptive && <div>
+                                                            <FormGroup>
+                                                                <Label htmlFor="marks">Marks</Label>
+                                                                <Input name="marks" type="number" required onChange={this.handleChange} />
+                                                            </FormGroup>
+                                                        </div>}
+                                                    {/* {console.log(this.state.quizQuestionDescriptive)} */}
+                                                    {!this.state.quizQuestionDescriptive && <div className="d-flex justify-content-end">
                                                         {this.state.questionOptions.length > 0 && <Button outline color="warning" onClick={e => this.removeOption()}>Remove option</Button>}&nbsp;
                                                         <Button outline color="primary" onClick={e => this.addOption()}>Add option</Button>
-                                                    </div>
+                                                    </div>}
                                                     <br /><br />
-                                                    <FormGroup>
+                                                    {!this.state.quizQuestionDescriptive && <FormGroup>
                                                         <Label htmlFor="answer">Answer</Label>
                                                         <Input invalid={this.state.errors.answer ? true : false} required type="select" name="answer" onChange={this.handleChange}>
                                                         <option key={'option'} value="">__SELECT_ANSWER__</option>
                                                            {this.state.questionOptions.map((option, idx) => <option key={'option-'+idx} value={`option${idx+1}`}>Option {idx+1}</option>)}
                                                         </Input>
-                                                    </FormGroup>
+                                                    </FormGroup>}
                                                     <button type="submit" className="btn btn-sm btn-primary mr-3">Submit</button>
                                                 </form>
                                             }
