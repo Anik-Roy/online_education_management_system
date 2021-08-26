@@ -88,7 +88,7 @@ class AssignmentDetails extends Component {
                             <NavItem onClick={this.alterSelectedNavitem} className={this.state.showAssignment ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
                                 Assignment
                             </NavItem>
-                            {this.props.userId === classTeacher && <NavItem onClick={this.alterSelectedNavitem} className={this.state.showResponse ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
+                            {<NavItem onClick={this.alterSelectedNavitem} className={this.state.showResponse ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>
                                 Responses
                             </NavItem>}
                             {this.props.userId === classTeacher && <NavItem onClick={this.alterSelectedNavitem} className={this.state.showChart ? "text-success mx-4": "text-muted mx-4"} style={{cursor: "pointer"}}>

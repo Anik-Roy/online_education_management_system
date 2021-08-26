@@ -38,13 +38,16 @@ class CreateClassWork extends Component {
             quizModalOpen: false,
             addQuizModalOpen: false,
             questionOptions: [],
-            initialValues: {question: "", answer: "", descriptiveQuestion: false, optionsLength: 0},
+            initialValues: {question: "", answer: "", descriptiveQuestion: false, marks: "1", optionsLength: 0},
             errors: {},
             title: '',
             instruction: '',
+            assignmentMarks: '',
             quizQuestions: [],
             quizQuestionDescriptive: false,
+            startingDate: '',
             dueDate: '',
+            acceptingQuiz: 'off',
             examType: '',
             assignmentFile: null,
             assignmentLink: "",
@@ -93,11 +96,37 @@ class CreateClassWork extends Component {
         });
     }
 
+    onStartDateInputChange = e => {
+        // console.log(e.target.value);
+        this.setState({
+            startingDate: e.target.value
+        });
+    }
+
     onDueDateInputChange = e => {
         // console.log(e.target.value);
         this.setState({
             dueDate: e.target.value
         });
+    }
+
+    onSubmissionAcceptingChange = e => {
+        // console.log('quiz accepting button change!');
+        console.log(e.target.name, e.target.value);
+        if(e.target.value === 'on') {
+            // console.log('on');
+            this.setState({
+                acceptingQuiz: 'off'
+            })
+        } else {
+            this.setState({
+                acceptingQuiz: 'on'
+            })
+        }
+
+        setTimeout(() => {
+            console.log(this.state.acceptingQuiz);
+        }, 3000);
     }
 
     handleAssignmentFile = e => {
@@ -122,13 +151,16 @@ class CreateClassWork extends Component {
             quizModalOpen: false,
             addQuizModalOpen: false,
             questionOptions: [],
-            initialValues: {question: "", answer: "", descriptiveQuestion: false, optionsLength: 0},
+            initialValues: {question: "", answer: "", descriptiveQuestion: false, marks: "1", optionsLength: 0},
             errors: {},
             title: '',
             instruction: '',
+            assignmentMarks: '',
             quizQuestions: [],
             quizQuestionDescriptive: false,
+            startingDate: '',
             dueDate: '',
+            acceptingQuiz: 'off',
             examType: '',
             assignmentFile: null,
             assignmentLink: "",
@@ -191,8 +223,10 @@ class CreateClassWork extends Component {
                                     title: this.state.title,
                                     instruction: this.state.instruction,
                                     assignmentFileUrl: downloadURL,
+                                    assignmentMarks: this.state.assignmentMarks,
                                     name,
                                     type,
+                                    startingDate: this.state.startingDate,
                                     dueDate: this.state.dueDate,
                                     author_id: this.props.userId,
                                     class_id: clsId
@@ -208,8 +242,10 @@ class CreateClassWork extends Component {
                     title: this.state.title,
                     instruction: this.state.instruction,
                     assignmentLink: this.state.assignmentLink,
+                    assignmentMarks: this.state.assignmentMarks,
                     name: '',
                     type: 'link',
+                    startingDate: this.state.startingDate,
                     dueDate: this.state.dueDate,
                     author_id: this.props.userId,
                     class_id: clsId
@@ -223,7 +259,9 @@ class CreateClassWork extends Component {
                 instruction: this.state.instruction,
                 // quizQuestionDescriptive: this.state.quizQuestionDescriptive,
                 quiz_questions: this.state.quizQuestions,
+                startingDate: this.state.startingDate,
                 dueDate: this.state.dueDate,
+                acceptingQuiz: this.state.acceptingQuiz,
                 author_id: this.props.userId,
                 class_id: clsId
             }
@@ -255,21 +293,22 @@ class CreateClassWork extends Component {
             quizModalOpen: !this.state.quizModalOpen,
         });
         if(flag === 'close') {
-            this.setState({
-                title: '',
-                instruction: '',
-                quizQuestions: [],
-                dueDate: '',
-                examType: '',
-                assignmentFile: null
-            });
+            // this.setState({
+            //     title: '',
+            //     instruction: '',
+            //     quizQuestions: [],
+            //     dueDate: '',
+            //     examType: '',
+            //     assignmentFile: null
+            // });
+            this.resetState();
         }
     }
     
     toogleAddQuizModal = () => {
         this.setState({
             addQuizModalOpen: !this.state.addQuizModalOpen,
-            initialValues: {question: "", answer: "", descriptiveQuestion: false, optionsLength: 0},
+            initialValues: {question: "", answer: "", descriptiveQuestion: false, marks: "1", optionsLength: 0},
             questionOptions: []
         });
     }
@@ -329,19 +368,35 @@ class CreateClassWork extends Component {
 
         if(e.target.name === "quizQuestionDescriptive") {
             console.log(e.target.name, e.target.checked);
-            let initialValues = {...this.state.initialValues, descriptiveQuestion: e.target.checked, marks: 0}
+
+            let initialValues = {...this.state.initialValues, descriptiveQuestion: e.target.checked}
+            let tmpOptions = [...this.state.questionOptions];
+
+            if(e.target.checked) {
+                tmpOptions = [];
+                initialValues['optionsLength'] = 0;
+            }
+
             this.setState({
                 [e.target.name]: e.target.checked,
-                initialValues: initialValues
+                initialValues: initialValues,
+                questionOptions: tmpOptions
             });
             return;
         }
 
         if(e.target.name === "marks") {
             console.log(e.target.name, e.target.value);
-            let initialValues = {...this.state.initialValues, descriptiveQuestion: true, [e.target.name]: e.target.value}
+            let initialValues = {...this.state.initialValues, [e.target.name]: e.target.value}
             this.setState({
                 initialValues: initialValues
+            });
+            return;
+        }
+
+        if(e.target.name === "assignmentMarks") {
+            this.setState({
+                assignmentMarks: e.target.value
             });
             return;
         }
@@ -374,13 +429,26 @@ class CreateClassWork extends Component {
         this.toogleAddQuizModal();
     }
 
+    handleAssignmentInfoSubmit = e => {
+        e.preventDefault();
+        this.toogleAddQuizModal();
+    }
+
     render() {
         const {clsId} = this.props;
+
+        let startingDate = new Date(this.state.startingDate);
+        let dueDate = new Date(this.state.dueDate);
+        let errorDateSetting = "";
+
+        if(dueDate < startingDate) {
+            errorDateSetting = "Due date cann't be earlier than starting date.";
+        }
 
         let uiQuizQuestions = this.state.quizQuestions.map((question, idx) => {
             return (
                 <li key={`quizquestion-${idx}`} className="card mt-2 p-3">
-                    <h3 className="card-title text-dark font-weight-bold">{idx+1}.&nbsp;{question.question}<span className="ml-2 text-info">{question.descriptiveQuestion ? `Marks: ${question.marks}` : "Marks: 1"}</span></h3>
+                    <h3 className="card-title text-dark font-weight-bold">{idx+1}.&nbsp;{question.question}<span className="ml-2 text-info">{`Marks: ${question.marks}`}</span></h3>
                     {/* {question.descriptiveQuestion? "descriptive > true" : "descriptive > false"} */}
                     {/* {question.descriptiveQuestion ? `${question.marks}` : "mark is 1"} */}
                     {
@@ -393,9 +461,9 @@ class CreateClassWork extends Component {
                         ))
                     }
                     {/* {console.log(question.optionsLength)} */}
-                    {!question.descriptiveQuestion && <div>
+                    {/* {!question.descriptiveQuestion && <div>
                         <label htmlFor={`question-${idx}-answers-4`}>Correct answer: {question.answer}</label>
-                    </div>}
+                    </div>} */}
                 </li>
             )
         });
@@ -474,18 +542,18 @@ class CreateClassWork extends Component {
                                                             </Label>
                                                         </FormGroup>
                                                     </div>
-                                                    {this.state.quizQuestionDescriptive && <div>
-                                                            <FormGroup>
-                                                                <Label htmlFor="marks">Marks</Label>
-                                                                <Input name="marks" type="number" required onChange={this.handleChange} />
-                                                            </FormGroup>
-                                                        </div>}
                                                     {/* {console.log(this.state.quizQuestionDescriptive)} */}
                                                     {!this.state.quizQuestionDescriptive && <div className="d-flex justify-content-end">
                                                         {this.state.questionOptions.length > 0 && <Button outline color="warning" onClick={e => this.removeOption()}>Remove option</Button>}&nbsp;
                                                         <Button outline color="primary" onClick={e => this.addOption()}>Add option</Button>
                                                     </div>}
-                                                    <br /><br />
+                                                    <div>
+                                                        <FormGroup>
+                                                            <Label htmlFor="marks">Marks</Label>
+                                                            <Input name="marks" type="number" min="1" step="0.01" required onChange={this.handleChange} />
+                                                        </FormGroup>
+                                                    </div>
+                                                    {/* <br /><br /> */}
                                                     {!this.state.quizQuestionDescriptive && <FormGroup>
                                                         <Label htmlFor="answer">Answer</Label>
                                                         <Input invalid={this.state.errors.answer ? true : false} required type="select" name="answer" onChange={this.handleChange}>
@@ -499,36 +567,51 @@ class CreateClassWork extends Component {
                                             
                                             {/* assignment form */}
                                             {
-                                                this.state.examType === 'Assignment' && 
-                                                <div>
-                                                    <input
-                                                        className="form-control"
-                                                        id="assignment-file-input"
-                                                        label="Select assignment(supported file type: pdf/docs)"
-                                                        name="question"
-                                                        type="file"
-                                                        onChange={this.handleAssignmentFile}
-                                                    />
-                                                    <br/>or give your assignment link<br/>
-                                                    <input
-                                                        className="form-control"
-                                                        id="assignment-file-link"
-                                                        label="Assignment link"
-                                                        type="text"
-                                                        name="assignmentLink"
-                                                        onChange={this.handleChange}
-                                                    />
-
-                                                    <button className="btn btn-sm btn-primary mt-2 mr-3" onClick={this.toogleAddQuizModal}>Done</button>
-                                                </div>
+                                                this.state.examType === 'Assignment' &&
+                                                <form onSubmit={this.handleAssignmentInfoSubmit}>
+                                                    <div>
+                                                        <input
+                                                            className="form-control"
+                                                            id="assignment-file-input"
+                                                            label="Select assignment(supported file type: pdf/docs)"
+                                                            name="question"
+                                                            type="file"
+                                                            onChange={this.handleAssignmentFile}
+                                                        />
+                                                        <br/>or give your assignment link<br/>
+                                                        <input
+                                                            className="form-control"
+                                                            id="assignment-file-link"
+                                                            label="Assignment link"
+                                                            type="text"
+                                                            name="assignmentLink"
+                                                            onChange={this.handleChange}
+                                                        />
+                                                        <div>
+                                                            <FormGroup>
+                                                                <Label htmlFor="marks">Marks</Label>
+                                                                <Input name="assignmentMarks" type="number" min="1" step="0.01" required onChange={this.handleChange} />
+                                                            </FormGroup>
+                                                        </div>
+                                                        <button className="btn btn-sm btn-primary mt-2 mr-3">Done</button>
+                                                    </div>
+                                                </form>
                                             }
                                         </ModalBody>
                                     </Modal>
                                     <br /><br /><br />
                                     <div className="quiz-questions" id="quiz">
-                                        {(uiQuizQuestions.length === 0 && this.state.assignmentFile === null && this.state.assignmentLink === "") && <h3>You've not added any question/assignment yet! Please add question/assignment.</h3>}
-                                        {this.state.assignmentFile && <h3>Assignment file: {this.state.assignmentFile.name}</h3>}
-                                        {this.state.assignmentLink && <h3>Assignment link: <a href={this.state.assignmentLink}>{this.state.assignmentLink}</a></h3>}
+                                        {this.state.title === '' && <Alert color="danger">Please give a {this.state.examType.toLowerCase()} title.</Alert>}
+                                        {this.state.startingDate === '' && <Alert color="danger">Please select starting date.</Alert>}
+                                        {this.state.examType === "Assignment" && this.state.dueDate === '' && <Alert color="danger">Please select due date.</Alert>}
+                                        {this.state.examType === "Assignment" && this.state.assignmentMarks === '' && <Alert color="danger">Please enter marks for this assignment.</Alert>}
+                                        {(this.state.examType === "Quiz" && uiQuizQuestions.length === 0) && <Alert color="danger">You've not added any question yet! Please add question.</Alert>}
+                                        {this.state.examType === "Assignment" && this.state.assignmentFile === null && this.state.assignmentLink === "" && <Alert color="danger">Please choose assignment file or link.</Alert>}
+                                        {errorDateSetting !== "" && <Alert className="mt-2" color="danger">{errorDateSetting}</Alert>}
+                                        {this.state.assignmentFile && <h3 className="text-success">Assignment file: {this.state.assignmentFile.name}</h3>}
+                                        {this.state.assignmentLink && <h3 className="text-success">Assignment link: <a href={this.state.assignmentLink}>{this.state.assignmentLink}</a></h3>}
+                                        <br/>
+                                        {this.state.examType === "Assignment" && this.state.assignmentMarks !== "" && <h3 className="text-success">Assignment marks: {this.state.assignmentMarks}</h3>}
                                         <ol>
                                             {uiQuizQuestions}
                                         </ol>
@@ -536,17 +619,26 @@ class CreateClassWork extends Component {
                                 </div>
                             </div>
                             <div className="quiz-right-container">
-                                <div className="form-group">
+                                {<div className="form-group">
+                                    <label>Starting Date</label><label style={{color: "red"}}>&nbsp;*</label>
+                                    <input type="datetime-local" step="60" name="startingDate" className="form-control" onChange={this.onStartDateInputChange} />
+                                </div>}
+                                {this.state.examType === 'Assignment' && <div className="form-group">
                                     <label>Due Date</label><label style={{color: "red"}}>&nbsp;*</label>
-                                    <input type="datetime-local" step="60" name="bday" className="form-control" onChange={this.onDueDateInputChange} />
-                                </div>
+                                    <input type="datetime-local" step="60" name="dueDate" className="form-control" onChange={this.onDueDateInputChange} />
+                                </div>}
+                                {this.state.examType === 'Quiz' && <div className="d-flex justify-items-center">
+                                    <b>Accepting responses</b>
+                                    <input style={{display:"none"}} type="checkbox" id="acceptingQuiz" name="acceptingQuiz" value={this.state.acceptingQuiz} onChange={this.onSubmissionAcceptingChange} />
+                                    <label htmlFor="acceptingQuiz" className="toggle"><span></span></label>    
+                                </div>}
                             </div>
                         </div>
                     </ModalBody>
                     <ModalFooter>
                         {/* {console.log(this.state.examType === 'Assignment' && this.state.assignmentFile === null && this.state.assignmentLink === "")} */}
                         {console.log(this.state)}
-                        <Button color="primary" onClick={() => this.onQuizSubmitClick(clsId)} disabled={this.state.title === '' || this.state.dueDate === '' || (this.state.examType === 'Quiz' && uiQuizQuestions.length === 0) || (this.state.examType === 'Assignment' && this.state.assignmentFile === null && this.state.assignmentLink === "") || ((this.state.examType === 'Assignment' && this.props.createAssignmentLoading) || this.state.fileUploading) || (this.state.examType === 'Quiz' && this.props.createQuizLoading) ? true : false}>Submit</Button>{' '}
+                        <Button color="primary" onClick={() => this.onQuizSubmitClick(clsId)} disabled={this.state.title === '' || this.state.startingDate === '' || (this.state.examType === 'Assignment' && this.state.dueDate === '') || errorDateSetting !== "" || (this.state.examType === 'Assignment' && this.state.assignmentMarks === '') || (this.state.examType === 'Quiz' && uiQuizQuestions.length === 0) || (this.state.examType === 'Assignment' && this.state.assignmentFile === null && this.state.assignmentLink === "") || ((this.state.examType === 'Assignment' && this.props.createAssignmentLoading) || this.state.fileUploading) || (this.state.examType === 'Quiz' && this.props.createQuizLoading) ? true : false}>Submit</Button>{' '}
                         {this.state.fileUploading && <Spinner color="success" />}
                         <Button color="secondary" onClick={() => this.toogleQuizModal('close')}>Cancel</Button>
                     </ModalFooter>

@@ -79,12 +79,17 @@ const AssignmentList = props => {
 
     let assignment_list = sorted_class_assignments.map((assignment, idx) => {
         // console.log(assignment);
+        let startingDate = new Date(assignment.data.startingDate);
         let dueDate = new Date(assignment.data.dueDate);
         return (
             <tr key={assignment.key}>
                 <th scope="row">{idx+1}</th>
                 <td><Link to={{pathname: `/class/${clsId}/${assignment.key}/assignment`, state: { assignmentDetails: assignment, classTeacher: props.classTeacher }}}>{assignment.data.title}</Link></td>
-                <td>{dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</td>
+                {/* <td>{startingDate.getDate()}/{startingDate.getMonth()+1}/{startingDate.getFullYear()}, {startingDate.toLocaleTimeString()}</td> */}
+                <td>{startingDate.toLocaleString()}</td>
+                {/* <td>{dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</td> */}
+                <td>{dueDate.toLocaleString()}</td>
+                
                 {props.userId !== props.classTeacher && <td>
                     {_.find(userAssignmentResponses, {assignment_id: assignment.key}) ? "submitted" : "not submitted"}
                 </td>}
@@ -113,6 +118,7 @@ const AssignmentList = props => {
                     <tr>
                         <th>#</th>
                         <th>Assignment Title</th>
+                        <th>Starting Date</th>
                         <th>Due Date</th>
                         {props.userId !== props.classTeacher && <th>Status</th>}
                         {props.userId === props.classTeacher && <th>Download Result</th>}

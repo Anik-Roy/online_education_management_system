@@ -273,11 +273,20 @@ export const createClass = (clsData, userId) => dispatch => {
     // let codeAvailable = false;
     let joinCode = '';
 
+    let alpha_numeric = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+                    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+                    'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     let uuid = [];
     // a.push(Math.floor(Math.random()*10));
 
-    for(let i = 0; i < 6; i++) {
-        uuid.push(Math.floor(Math.random()*10));
+    for(let i = 0; i < 8; i++) {
+        let rand_idx = Math.floor(Math.random()*61);
+        if(rand_idx < 0) {
+            rand_idx = 0;
+        } else if(rand_idx >= alpha_numeric.length) {
+            rand_idx = alpha_numeric.length - 1;
+        }
+        uuid.push(alpha_numeric[rand_idx]);
     }
     uuid = uuid.join('');
     // console.log(uuid);
@@ -1196,6 +1205,74 @@ export const submitQuiz = user_response => dispatch => {
             console.log(error);
             dispatch(submitQuizError(error))
         });
+}
+
+export const updateQuizResponsesLoading = isLoading => {
+    return {
+        type: actionTypes.UPDATE_QUIZ_RESPONSES_LOADING,
+        payload: isLoading
+    }
+}
+
+export const updateQuizResponse = (quizResponses, quizQuestions) => async dispatch => {
+    dispatch(updateQuizResponsesLoading(true));
+
+    // console.log(quizResponses);
+    // console.log(quizQuestions);
+
+    for(let i = 0; i < quizResponses.length; i++) {
+        // console.log(quizResponses[i]);
+        let total_correct = 0;
+        let total_wrong = 0;
+
+        let quiz_response_id = quizResponses[i].key;
+        // console.log('Quiz response id > ', quiz_response_id);
+
+        quizQuestions.forEach((question, idx) => {
+            if(question.descriptiveQuestion) {
+                // let user_answer = submitted_data[idx];
+                // submitted_data[idx] = {user_answer: user_answer, marks: ""}
+            } else {
+                if(question.answer === quizResponses[i].user_answer[idx]) {
+                    total_correct++;
+                } else {
+                    total_wrong++;
+                }
+            }
+        });
+        // console.log(total_correct);
+        // console.log(total_wrong);
+
+        let updated_respose = {
+            "total_correct": total_correct,
+            "total_wrong": total_wrong
+        }
+        await updateSingleQuizResponse(updated_respose, quiz_response_id);
+    }
+
+    console.log('done!');
+    dispatch(updateQuizResponsesLoading(false));
+
+    // user_response = {
+    //     user_answer: {...submitted_data},
+    //     total_correct,
+    //     total_wrong,
+    //     user_id: this.props.userId,
+    //     quiz_id: quizId
+    // }
+    // this.props.submitQuiz(user_response);
+}
+
+const updateSingleQuizResponse = async (updated_response, quiz_response_id) => {
+    // console.log(updated_response, quiz_response_id);
+    await axios.patch(`https://sust-online-learning-default-rtdb.firebaseio.com/quiz_responses/${quiz_response_id}.json`, updated_response)
+        .then(response => {
+            console.log(response);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+
 }
 
 export const submitAssignmentLoading = isLoading => {

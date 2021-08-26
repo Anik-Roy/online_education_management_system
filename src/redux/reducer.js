@@ -33,6 +33,7 @@ const INITIAL_STATE = {
     fetchQuizesLoading: false,
     quizSubmissionLoading: false,
     fetchQuizResponsesLoading: false,
+    updateQuizResponsesLoading: false,
     fetchAssignmentsLoading: false,
     assignmentSubmissionLoading: false,
     fetchAssignmentResponsesLoading: false,
@@ -568,13 +569,20 @@ export const reducer = (state=INITIAL_STATE, action) => {
         case actionTypes.FETCH_QUIZ_RESPONSES:
             return {
                 ...state,
-                quizResponses: action.payload
+                quizResponses: action.payload,
+                quizSubmissionSuccessMsg: ""
             }
         
         case actionTypes.FETCH_QUIZ_RESPONSES_ERROR:
             return {
                 ...state,
                 fetchQuizResponsesErrorMsg: 'An error occured duing fetching the responses of the quiz! Try again!'
+            }
+
+        case actionTypes.UPDATE_QUIZ_RESPONSES_LOADING:
+            return {
+                ...state,
+                updateQuizResponsesLoading: action.payload
             }
 
         case actionTypes.FETCH_ASSIGNMENT_RESPONSES_LOADING:

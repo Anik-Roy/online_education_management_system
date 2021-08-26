@@ -36,7 +36,7 @@ const QuizList = props => {
         let total_descriptive_answer_mark = 0;
         quiz_response.user_answer.map((answer, idx) => {
             if(typeof answer === 'object' && answer.marks !== "") {
-                total_descriptive_answer_mark += parseInt(answer.marks);
+                total_descriptive_answer_mark += parseFloat(answer.marks);
             }
             return true;
         });
@@ -46,8 +46,8 @@ const QuizList = props => {
             universityId: quiz_response.userProfile.universityId,
             mobileNo: quiz_response.userProfile.mobileNo,
             total_marks: total_descriptive_answer_mark + quiz_response.total_correct,
-            total_correct: quiz_response.total_correct,
-            total_wrong: quiz_response.total_wrong
+            total_marks_in_mcq: quiz_response.total_correct,
+            // total_wrong: quiz_response.total_wrong
         }
     });
     
@@ -56,9 +56,9 @@ const QuizList = props => {
         { label: "Full Name", key: "fullName" },
         { label: "Student Id", key: "universityId" },
         { label: "Mobile no", key: "mobileNo" },
-        { label: "Total marks", key: "total_marks"},
-        { label: "Total MCQ correct", key: "total_correct" },
-        { label: "Total MCQ wrong", key: "total_wrong" }
+        { label: "Obtained marks", key: "total_marks"},
+        { label: "Total marks in MCQ", key: "total_marks_in_mcq" },
+        // { label: "Total MCQ wrong", key: "total_wrong" }
     ];
 
     // useEffect(() => {
@@ -88,12 +88,14 @@ const QuizList = props => {
     });
 
     let quiz_list = sorted_class_quizes.map((quiz, idx) => {
-        let dueDate = new Date(quiz.data.dueDate);
+        let startingDate = new Date(quiz.data.startingDate);
         return (
             <tr key={quiz.key}>
                 <th scope="row">{idx+1}</th>
                 <td><Link to={{pathname: `/class/${clsId}/${quiz.key}/quiz`, state: { quizDetails: quiz, classTeacher: props.classTeacher }}}>{quiz.data.title}</Link></td>
-                <td>{dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</td>
+                {/* <td>{dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}</td> */}
+                <td>{startingDate.toLocaleString()}</td>
+                <td>{quiz.data.acceptingQuiz}</td>
                 {props.userId !== props.classTeacher && <td>
                     {_.find(userQuizResponses, {quiz_id: quiz.key}) ? "submitted" : "not submitted"}
                 </td>}
@@ -140,7 +142,9 @@ const QuizList = props => {
                     <tr>
                         <th>#</th>
                         <th>Quiz Title</th>
-                        <th>Due Date</th>
+                        {/* <th>Due Date</th> */}
+                        <th>Starting Date</th>
+                        <th>Accepting responses status</th>
                         {props.userId !== props.classTeacher && <th>Status</th>}
                         {props.userId === props.classTeacher && <th>Download Result</th>}
                     </tr>
