@@ -75,10 +75,10 @@ class Home extends Component {
             <div className="mt-5">
                 {this.props.fetchClassLoading && <div className="text-center"><Spinner color="success" /></div>}
                 {this.props.fetchClassErrorMsg !== "" && this.props.fetchClassErrorMsg}
-                {this.props.unenrollClassSuccessMsg !== "" && <Alert color="success">{this.props.unenrollClassSuccessMsg}</Alert>}
+                {this.props.unenrollClassSuccessMsg !== "" && <Alert color="success" style={{width: "315px", margin: "0 auto"}}>{this.props.unenrollClassSuccessMsg}</Alert>}
                 {this.props.unenrollClassErrorMsg !== "" && <Alert color="danger">{this.props.unenrollClassErrorMsg}</Alert>}
                 {this.props.joinedAlreadyMsg !== "" && <Alert color="info">{this.props.joinedAlreadyMsg}</Alert>}
-                {this.props.joinClassFailedMsg !== "" && <Alert color="info">{this.props.joinClassFailedMsg}</Alert>}
+                {this.props.joinClassFailedMsg !== "" && <Alert color="danger" style={{width: "315px", margin: "0 auto"}}>{this.props.joinClassFailedMsg}</Alert>}
                 
                 <div className="all-class">
                     {classCards.length === 0 && <Alert className="mx-auto" color="info">You've not joined/created any class yet!</Alert>}

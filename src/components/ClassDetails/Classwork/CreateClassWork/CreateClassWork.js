@@ -5,6 +5,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faFileAlt, faPlus, faAlignLeft, faCheck} from '@fortawesome/free-solid-svg-icons';
 import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Label, Input, Spinner, Alert} from 'reactstrap';
+import DateTimePicker from 'react-datetime-picker';
 import {createQuiz, createAssignment} from '../../../../redux/actionCreators';
 import {connect} from 'react-redux';
 import { firebase, storage } from '../../../../firebase';
@@ -96,17 +97,25 @@ class CreateClassWork extends Component {
         });
     }
 
-    onStartDateInputChange = e => {
+    onStartDateInputChange = value => {
         // console.log(e.target.value);
+        // this.setState({
+        //     startingDate: e.target.value
+        // });
+        console.log(value);
         this.setState({
-            startingDate: e.target.value
+            startingDate: value
         });
     }
 
-    onDueDateInputChange = e => {
+    onDueDateInputChange = value => {
         // console.log(e.target.value);
+        // this.setState({
+        //     dueDate: e.target.value
+        // });
+        console.log(value);
         this.setState({
-            dueDate: e.target.value
+            dueDate: value
         });
     }
 
@@ -621,14 +630,18 @@ class CreateClassWork extends Component {
                             <div className="quiz-right-container">
                                 {<div className="form-group">
                                     <label>Starting Date</label><label style={{color: "red"}}>&nbsp;*</label>
-                                    <input type="datetime-local" step="60" name="startingDate" className="form-control" onChange={this.onStartDateInputChange} />
+                                    <br/>
+                                    {/* <input type="datetime-local" step="60" name="startingDate" className="form-control" onChange={this.onStartDateInputChange} /> */}
+                                    <DateTimePicker onChange={value => this.onStartDateInputChange(value)} value={this.state.startingDate} />
                                 </div>}
                                 {this.state.examType === 'Assignment' && <div className="form-group">
                                     <label>Due Date</label><label style={{color: "red"}}>&nbsp;*</label>
-                                    <input type="datetime-local" step="60" name="dueDate" className="form-control" onChange={this.onDueDateInputChange} />
+                                    <br/>
+                                    {/* <input type="datetime-local" step="60" name="dueDate" className="form-control" onChange={this.onDueDateInputChange} /> */}
+                                    <DateTimePicker onChange={value => this.onDueDateInputChange(value)} value={this.state.dueDate} />
                                 </div>}
                                 {this.state.examType === 'Quiz' && <div className="d-flex justify-items-center">
-                                    <b>Accepting responses</b>
+                                    <b>{this.state.acceptingQuiz === "on" ? "Accepting responses" : "Not accepting responses"}</b>
                                     <input style={{display:"none"}} type="checkbox" id="acceptingQuiz" name="acceptingQuiz" value={this.state.acceptingQuiz} onChange={this.onSubmissionAcceptingChange} />
                                     <label htmlFor="acceptingQuiz" className="toggle"><span></span></label>    
                                 </div>}

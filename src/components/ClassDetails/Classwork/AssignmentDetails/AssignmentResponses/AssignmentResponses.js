@@ -80,7 +80,7 @@ const AssignmentResponses = props => {
             return <tr key={assignment_response.key}>
                 <th scope="row">{assignment_response.userProfile?.fullName !== "" ?  assignment_response.userProfile?.fullName : assignment_response.userProfile?.email}</th>
                 <td><a href={assignment_response.assignmentFileUrl}>Click here to view submission</a></td>
-                <td>{assignment_response.marks===""?"pending marks":assignment_response.marks}</td>
+                <td>{assignment_response.marks===""?(<span className="text-danger">pending marks</span>):(<span className="text-success">{assignment_response.marks}</span>)}</td>
                 {props.userId === props.assignmentDetails.data.author_id && <td style={{cursor: 'pointer'}} onClick={() => {onShowResponseClick(assignment_response.user_id, assignment_response); toogleResponseModal();}}><FontAwesomeIcon className="mr-3" style={{color: "black"}} icon={faHandPointUp} />Show response</td>}
             </tr>
         } else {

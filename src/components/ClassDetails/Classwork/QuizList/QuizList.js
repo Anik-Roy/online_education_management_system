@@ -137,7 +137,7 @@ const QuizList = props => {
                 </div>)
             }
             <h3>Quiz List</h3>
-            <Table className="text-center">
+            <Table className="text-start">
                 <thead>
                     <tr>
                         <th>#</th>

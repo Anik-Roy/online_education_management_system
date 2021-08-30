@@ -135,6 +135,7 @@ class AssignmentContent extends Component {
         }
 
         console.log('starting date > ',startingDate, 'due date > ', dueDate, 'current date > ', currentDate);
+
         return (
             <div className="assignment-content-root">
                 <div className="assignment-content">
@@ -143,7 +144,7 @@ class AssignmentContent extends Component {
                     {notStartedMsg !== "" && <h5 className="text-center text-info">Starting date is {startingDate.toLocaleString()}.</h5>}
                     {alreadySubmittedMsg !== "" && <h5 className="text-center p-2 mx-auto" style={{color: "#9F6000", backgroundColor: "#FEEFB3", width: "460px"}}>{alreadySubmittedMsg}</h5>}
                     
-                    <div className="card assignment-file-div">
+                    {((notStartedMsg === "" && dateOverMsg === "") || alreadySubmittedMsg !== "" || this.state.countDownFinished || (this.props.userId === this.props.assignmentDetails.data.author_id)) && <><div className="card assignment-file-div">
                         <h4>Assignment topic: <a target="_blank" rel="noreferrer" href={assignmentDetails.data.assignmentFileUrl ? assignmentDetails.data.assignmentFileUrl : assignmentDetails.data.assignmentLink }>{assignmentDetails.data.title}</a></h4>
                         <h5 style={{color: "#000"}}>Starting date: {startingDate.toLocaleString()}</h5>
                         <h5 style={{color: "#000"}}>Due date: {dueDate.toLocaleString()}</h5>
@@ -177,7 +178,7 @@ class AssignmentContent extends Component {
                             {/* <input type="submit" id="assignment-file-upload-btn" className="btn btn-primary" value="Submit" disabled={this.state.assignmentFile && !submitBtnDisabled && alreadySubmittedMsg === '' && this.props.assignmentSubmissionSuccessMsg === "" ? false : true} style={{cursor: submitBtnDisabled || alreadySubmittedMsg !== "" ? "no-drop" : "pointer"}} onClick={e => this.handleAssignmentSubmit(e, assignmentId)} /> */}
                             <div style={{color: "#FF6263"}} className="ml-2">{this.state.assignmentFile === null && <p>Please select a file(file must be in pdf format.)</p>}</div>
                         </form>
-                    </div>
+                    </div></>}
                 </div>
             </div>
         );

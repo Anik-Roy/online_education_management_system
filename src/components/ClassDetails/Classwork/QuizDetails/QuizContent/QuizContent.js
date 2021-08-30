@@ -41,6 +41,7 @@ class QuizContent extends Component {
             open: false,
             id: null
         },
+        questionMarks: "",
         quizSubmitted: false
     }
 
@@ -100,6 +101,21 @@ class QuizContent extends Component {
     
     componentDidMount() {
         this.props.fetchQuizResponses(this.props.quizDetails.key);
+        let quiz_id = this.props.quizDetails.key;
+        axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/quizes/${quiz_id}.json`)
+            .then(response => {
+                // console.log(response.data);
+                this.setState({
+                    quizQuestions: response.data.quiz_questions,
+                    acceptingQuiz: response.data.acceptingQuiz
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    fetchQuizInfo = () => {
         let quiz_id = this.props.quizDetails.key;
         axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/quizes/${quiz_id}.json`)
             .then(response => {
@@ -286,7 +302,7 @@ class QuizContent extends Component {
         let startingDate = new Date(this.props.quizDetails.data.startingDate);
         // let dueDate = new Date(this.props.quizDetails.data.dueDate);
         let currentDate = new Date();
-        // console.log(this.props.quizDetails.key, this.props.quizResponses);
+        console.log(this.props.quizDetails.key, this.props.quizResponses);
         
         let already_submitted = _.find(this.props.quizResponses, {user_id: this.props.userId});
         let submitBtnDisabled = false;
@@ -370,14 +386,15 @@ class QuizContent extends Component {
                     )}
                     {this.state.noLongerAcceptingMsg && <Alert color="danger">{this.state.noLongerAcceptingMsg}</Alert>}
                     {this.state.acceptingQuiz === "off" && <Alert color="info">No longer accepting responses!</Alert>}
-                    <div className="m-3" style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                        <h3 className="text-center">Take participate in the {this.props.quizDetails.data.title}</h3>
+                    <div className="m-3" style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+                        <h3 className="text-center ml-5">Take participate in the {this.props.quizDetails.data.title}</h3>
                         {/* {this.props.userId === this.props.quizDetails.data.author_id && <label className="label-switch switch-success ml-3 border border-success rounded p-2 d-flex justify-items-center">
                             <b className="text-success">Accepting responses</b>
                             <input type="checkbox" className="switch switch-bootstrap status" name="acceptingQuiz" id="acceptingQuiz" value={this.state.acceptingQuiz} checked={this.state.acceptingQuiz === "on" ? "checked" : ""} onChange={this.onSubmissionAcceptingChange} />
                             <span className="lable ml-3"></span>
                         </label>} */}
                         {this.props.userId === this.props.quizDetails.data.author_id && <div className="d-flex justify-items-center">
+                            {this.state.acceptingQuiz === "on" ? (<b>Accepting responses</b>) : (<b>Not accepting responess</b>)}
                             <input style={{display:"none"}} type="checkbox" id="acceptingQuiz" name="acceptingQuiz" value={this.state.acceptingQuiz} checked={this.state.acceptingQuiz === "on" ? "checked" : ""} onChange={this.onSubmissionAcceptingChange} />
                             <label htmlFor="acceptingQuiz" className="toggle"><span></span></label>    
                         </div>}
@@ -385,7 +402,7 @@ class QuizContent extends Component {
                     {/* {dateOverMsg !== "" && <h5 className="text-center p-2 mx-auto" style={{color: "#D8000C", backgroundColor: "#FFD2D2", width: "460px"}}>Due date was {dueDate.getUTCDate()}/{dueDate.getUTCMonth()+1}/{dueDate.getUTCFullYear()}, {dueDate.toLocaleTimeString()}!<br/> You can no longer participate in this tutorial.</h5>} */}
                     {notStartedMsg !== "" && <h5 className="text-center text-info">Starting date is {startingDate.toLocaleString()}.</h5>}
                     {alreadySubmittedMsg !== "" && <h5 className="text-center p-2 mx-auto" style={{color: "#9F6000", backgroundColor: "#FEEFB3", width: "460px"}}>{alreadySubmittedMsg}</h5>}
-                    <Formik
+                    {(notStartedMsg === "" || this.props.userId === this.props.quizDetails.data.author_id) && <Formik
                         initialValues={
                             formik_initial_values
                         }
@@ -407,11 +424,11 @@ class QuizContent extends Component {
                                     </Form>
                                 )
                             }
-                    </Formik>
+                    </Formik>}
                     <Modal isOpen={this.state.isOpen} toggle={this.toggle}>
                         <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
                         <ModalBody>
-                            {this.state.selectedQuestion?.descriptiveQuestion && <form>
+                            {this.state.selectedQuestion?.descriptiveQuestion && <form onSubmit={e => this.handleQuestionUpdate(e)}>
                                 <div className="form-group">
                                     <label htmlFor="question">Question</label>
                                     <input type="text" className="form-control" id="question" name="question" value={this.state.selectedQuestion?.question} onChange={this.handleOnChange} />
@@ -441,6 +458,11 @@ class QuizContent extends Component {
                                 })}
                                 {this.state.selectedQuestion?.optionsLength > 0 && <Button outline color="warning" onClick={e => this.removeOption()}>Remove option</Button>}&nbsp;
                                 <Button outline color="primary" onClick={e => this.addOption()}>Add option</Button>
+                                <br/>
+                                <FormGroup>
+                                    <Label htmlFor="marks">Marks</Label>
+                                    <Input name="marks" type="number" min="1" step="0.01" required value={this.state.selectedQuestion?.marks} onChange={this.handleOnChange} />
+                                </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="answer">Answer</Label>
                                     <Input required type="select" name="answer" onChange={this.handleOnChange}>

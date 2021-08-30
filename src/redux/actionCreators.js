@@ -1,5 +1,6 @@
 import * as actionTypes from './actionTypes';
 import axios from 'axios';
+let _ = require('lodash');
 
 // authentication actions
 export const authSuccess = (token, userId) => {
@@ -434,7 +435,8 @@ export const joinClass = (classCode, userId) => dispatch => {
                 axios.get(`https://sust-online-learning-default-rtdb.firebaseio.com/classes.json?orderBy="joinCode"&equalTo="${classCode}"`)
                     .then(response => {
                         // console.log(response);
-                        if(response.data !== null) {
+                        if(!_.isEmpty(response.data)) {
+                            console.log(response.data);
                             let classDetails = {}
                             let class_info = {};
 
@@ -488,7 +490,7 @@ export const joinClass = (classCode, userId) => dispatch => {
                         } else {
                             console.log("No class found with this id!");
                             dispatch(joinClassLoading(false));
-                            dispatch(joinClassFailed("No class found with this id!"));
+                            dispatch(joinClassFailed("No class found with this code!"));
                             dispatch(toogleJoinClassModal());
                         }
                     })

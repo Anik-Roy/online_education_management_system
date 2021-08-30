@@ -113,7 +113,7 @@ const AssignmentList = props => {
     return (
         <div>
             <h3>Assignment List</h3>
-            <Table className="text-center">
+            <Table className="text-start">
                 <thead>
                     <tr>
                         <th>#</th>
